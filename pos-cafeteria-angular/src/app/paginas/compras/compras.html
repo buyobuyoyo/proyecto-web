@@ -1,0 +1,154 @@
+<div class="compras-layout">
+  @if (cargando()) {
+    <p class="estado-mensaje">Cargando compras…</p>
+  } @else if (error()) {
+    <p class="estado-mensaje estado-error">No se pudo cargar la información: {{ error() }}</p>
+  } @else {
+    <section class="proveedores-seccion">
+      <h3>Proveedores</h3>
+      <div class="proveedores-lista">
+        @for (proveedor of proveedores(); track proveedor.id) {
+          <span class="proveedor-pill">
+            <span class="proveedor-nombre">{{ proveedor.nombre }}</span>
+            <button type="button" class="proveedor-accion" (click)="abrirEditarProveedor(proveedor)" aria-label="Editar proveedor">✎</button>
+            <button type="button" class="proveedor-accion" (click)="eliminarProveedor(proveedor)" aria-label="Eliminar proveedor">×</button>
+          </span>
+        } @empty {
+          <p class="estado-mensaje">No hay proveedores registrados.</p>
+        }
+        <button type="button" class="proveedor-nuevo" (click)="abrirNuevoProveedor()">+ Nuevo proveedor</button>
+      </div>
+    </section>
+
+    <section class="compras-seccion">
+      <div class="compras-header">
+        <h3>Órdenes de compra</h3>
+        <button type="button" class="btn-agregar" (click)="abrirNuevaCompra()">+ Agregar compra</button>
+      </div>
+
+      <div class="compras-lista">
+        <div class="compra-fila compra-encabezado">
+          <span>Fecha</span>
+          <span>Proveedor</span>
+          <span>Total</span>
+          <span>Estado</span>
+          <span></span>
+        </div>
+
+        @for (compra of compras(); track compra.id) {
+          <div class="compra-fila">
+            <span>{{ compra.fecha }}</span>
+            <span>{{ compra.proveedor?.nombre ?? '—' }}</span>
+            <span>${{ compra.total.toFixed(2) }}</span>
+            <span class="compra-estado" [class]="'estado-' + compra.estado">{{ compra.estado }}</span>
+            <span class="compra-acciones">
+              <button type="button" class="proveedor-accion" (click)="abrirEditarCompra(compra)" aria-label="Editar compra">✎</button>
+              <button type="button" class="proveedor-accion" (click)="eliminarCompra(compra)" aria-label="Eliminar compra">🗑</button>
+            </span>
+          </div>
+        } @empty {
+          <p class="estado-mensaje">No hay compras registradas.</p>
+        }
+      </div>
+    </section>
+  }
+</div>
+
+<app-modal
+  [abierto]="modalProveedorAbierto()"
+  [titulo]="proveedorEditando() ? 'Editar proveedor' : 'Nuevo proveedor'"
+  (cerrar)="cerrarModalProveedor()">
+  <form class="form-modal" (ngSubmit)="guardarProveedor()">
+    <label>
+      Nombre
+      <input type="text" name="nombre" [(ngModel)]="formProveedor.nombre" required maxlength="100">
+    </label>
+
+    <label>
+      Contacto (opcional)
+      <input type="text" name="contacto" [(ngModel)]="formProveedor.contacto" maxlength="150">
+    </label>
+
+    @if (formErrorProveedor()) {
+      <p class="form-error">{{ formErrorProveedor() }}</p>
+    }
+
+    <div class="form-acciones">
+      <button type="button" class="form-btn-cancelar" (click)="cerrarModalProveedor()">Cancelar</button>
+      <button type="submit" class="form-btn-guardar" [disabled]="guardandoProveedor()">
+        {{ guardandoProveedor() ? 'Guardando…' : 'Guardar' }}
+      </button>
+    </div>
+  </form>
+</app-modal>
+
+<app-modal
+  [abierto]="modalCompraAbierto()"
+  [titulo]="compraEditando() ? 'Editar compra' : 'Nueva compra'"
+  (cerrar)="cerrarModalCompra()">
+  <form class="form-modal form-compra" (ngSubmit)="guardarCompra()">
+    <label>
+      Proveedor
+      <select name="id_proveedor" [(ngModel)]="formCompra.id_proveedor" required>
+        @for (proveedor of proveedores(); track proveedor.id) {
+          <option [ngValue]="proveedor.id">{{ proveedor.nombre }}</option>
+        }
+      </select>
+    </label>
+
+    <label>
+      Fecha
+      <input type="date" name="fecha" [(ngModel)]="formCompra.fecha" required>
+    </label>
+
+    <label>
+      Estado
+      <select name="estado" [(ngModel)]="formCompra.estado" required>
+        <option value="pendiente">Pendiente</option>
+        <option value="recibida">Recibida</option>
+        <option value="cancelada">Cancelada</option>
+      </select>
+    </label>
+
+    <div class="lineas-compra">
+      <div class="linea-fila linea-encabezado">
+        <span>Producto</span>
+        <span>Cantidad</span>
+        <span>Precio unit.</span>
+        <span></span>
+      </div>
+
+      @for (linea of lineas(); track $index) {
+        <div class="linea-fila">
+          <select [(ngModel)]="linea.id_producto" [name]="'producto' + $index" (ngModelChange)="autocompletarPrecio($index)" required>
+            <option [ngValue]="null" disabled>Selecciona…</option>
+            @for (producto of productos(); track producto.id) {
+              <option [ngValue]="producto.id">{{ producto.nombre }}</option>
+            }
+          </select>
+          <input type="number" [(ngModel)]="linea.cantidad" [name]="'cantidad' + $index" min="1" step="1" required>
+          <input type="number" [(ngModel)]="linea.precio_unitario" [name]="'precio' + $index" min="0" step="0.01" required>
+          <button type="button" class="linea-quitar" (click)="quitarLinea($index)" aria-label="Quitar línea" [disabled]="lineas().length === 1">×</button>
+        </div>
+      }
+
+      <button type="button" class="linea-agregar" (click)="agregarLinea()">+ Agregar línea</button>
+    </div>
+
+    <div class="compra-total">
+      <span>Total</span>
+      <strong>${{ totalCompra().toFixed(2) }}</strong>
+    </div>
+
+    @if (formErrorCompra()) {
+      <p class="form-error">{{ formErrorCompra() }}</p>
+    }
+
+    <div class="form-acciones">
+      <button type="button" class="form-btn-cancelar" (click)="cerrarModalCompra()">Cancelar</button>
+      <button type="submit" class="form-btn-guardar" [disabled]="guardandoCompra()">
+        {{ guardandoCompra() ? 'Guardando…' : 'Guardar' }}
+      </button>
+    </div>
+  </form>
+</app-modal>

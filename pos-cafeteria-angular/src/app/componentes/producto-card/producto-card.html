@@ -1,0 +1,11 @@
+<article class="producto-card">
+  @if (mostrarAcciones()) {
+    <div class="producto-acciones">
+      <button type="button" class="producto-accion-btn" (click)="editar.emit()" aria-label="Editar producto">✎</button>
+      <button type="button" class="producto-accion-btn producto-accion-eliminar" (click)="eliminar.emit()" aria-label="Eliminar producto">🗑</button>
+    </div>
+  }
+  <img [src]="imagen()" [alt]="nombre()" class="producto-imagen" loading="lazy">
+  <p class="producto-nombre">{{ nombre() }}</p>
+  <span class="producto-etiqueta">{{ etiqueta() }}</span>
+</article>

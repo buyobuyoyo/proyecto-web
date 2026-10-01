@@ -1,0 +1,220 @@
+.finanzas-layout {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+}
+
+.finanzas-izquierda {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.finanzas-totales {
+  background: var(--gris-claro);
+  border-radius: 8px;
+  padding: 1rem;
+}
+
+.finanzas-totales p {
+  margin: 0.3rem 0;
+}
+
+.finanzas-scrollbox {
+  background: var(--gris-claro);
+  border-radius: 8px;
+  padding: 0.5rem;
+  max-height: 260px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.finanzas-dia {
+  background: white;
+  border-radius: 6px;
+  padding: 0.7rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+}
+
+.finanzas-dia p {
+  margin: 0.15rem 0;
+  font-size: 0.9rem;
+}
+
+.finanzas-fecha {
+  font-weight: 700;
+}
+
+.finanzas-derecha {
+  flex: 1;
+  min-width: 0;
+  border: 1px solid var(--gris-medio);
+  border-radius: 8px;
+  padding: 1rem;
+  background: white;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+.grafico-barras {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-around;
+  gap: 0.75rem;
+  height: 220px;
+  border-bottom: 2px solid var(--gris-oscuro);
+  padding-top: 1rem;
+}
+
+.barra-grupo {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  height: 100%;
+  gap: 0.4rem;
+  min-width: 0;
+}
+
+.barra-grupo span {
+  font-size: 0.85rem;
+  white-space: nowrap;
+}
+
+.barra {
+  width: 50px;
+  border-radius: 4px 4px 0 0;
+}
+
+@media (max-width: 800px) {
+  .finanzas-layout {
+    flex-direction: column;
+  }
+
+  .finanzas-scrollbox {
+    max-height: 320px;
+  }
+}
+
+@media (max-width: 420px) {
+  .barra {
+    width: 34px;
+  }
+
+  .barra-grupo span {
+    font-size: 0.75rem;
+  }
+}
+
+.barra-insumos {
+  background: #e5484d;
+}
+
+.barra-personal {
+  background: #f2b705;
+}
+
+.barra-ventas {
+  background: var(--verde-principal);
+}
+
+.movimientos-seccion {
+  margin-top: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+}
+
+.movimientos-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+.movimientos-header h3 {
+  margin: 0;
+}
+
+.movimientos-lista {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--gris-medio);
+  border-radius: 8px;
+  overflow: hidden;
+  background: white;
+}
+
+.movimiento-fila {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr 0.9fr 1.4fr 4.5rem;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.7rem 1rem;
+  border-bottom: 1px solid var(--gris-claro);
+}
+
+.movimiento-fila:last-child {
+  border-bottom: none;
+}
+
+.movimiento-encabezado {
+  font-weight: 700;
+  background: var(--gris-claro);
+}
+
+.movimiento-tipo {
+  display: inline-block;
+  width: fit-content;
+  padding: 0.15rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: white;
+}
+
+.tipo-ingreso_venta {
+  background: var(--verde-principal);
+}
+
+.tipo-gasto_insumo {
+  background: #e5484d;
+}
+
+.tipo-gasto_personal {
+  background: #f2b705;
+  color: var(--texto-principal);
+}
+
+.movimiento-acciones {
+  display: flex;
+  gap: 0.3rem;
+}
+
+.movimiento-accion {
+  border: none;
+  background: var(--gris-claro);
+  border-radius: 50%;
+  width: 1.6rem;
+  height: 1.6rem;
+  font-size: 0.8rem;
+  line-height: 1;
+}
+
+.movimiento-accion:hover {
+  background: var(--gris-medio);
+}
+
+@media (max-width: 700px) {
+  .movimiento-fila {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .movimiento-encabezado {
+    display: none;
+  }
+}

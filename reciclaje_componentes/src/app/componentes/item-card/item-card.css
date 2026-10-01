@@ -1,0 +1,32 @@
+h3 {
+  font-family: Basiic, sans-serif;
+  font-size: 12px;
+  margin: 4px 0;
+  color: #5e3023;
+}
+
+p {
+    font-family: Basiic, sans-serif;
+  font-size: 11px;
+  margin: 0;
+}
+
+.box {
+  background: rgba(255, 255, 255, 0.5);
+  border: 1px dashed #5e3023;
+  padding: 8px;
+  width: 100%;
+  text-align: center;
+  color: #4a2c11;
+  font-family: DotGothic16, monospace;
+}
+
+img {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+  display: block;
+  margin: 0 auto 6px auto;
+  border-bottom: 1px dashed #5e3023;
+  padding-bottom: 4px;
+}

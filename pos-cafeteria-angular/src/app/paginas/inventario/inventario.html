@@ -1,0 +1,120 @@
+<div class="inventario-layout">
+  <input type="text" class="buscador" placeholder="Artículo o Cód. Barras" aria-label="Buscar artículo o código de barras">
+
+  <div class="categorias">
+    @for (categoria of categorias(); track categoria.id) {
+      <span class="categoria-pill" [class.activa]="categoriaSeleccionada() === categoria.id">
+        <button
+          type="button"
+          class="categoria-btn"
+          (click)="seleccionarCategoria(categoria.id)">
+          {{ categoria.nombre }}
+        </button>
+        <button type="button" class="categoria-accion" (click)="abrirEditarCategoria(categoria, $event)" aria-label="Editar categoría">✎</button>
+        <button type="button" class="categoria-accion" (click)="eliminarCategoria(categoria, $event)" aria-label="Eliminar categoría">×</button>
+      </span>
+    }
+    <button type="button" class="categoria-nueva" (click)="abrirNuevaCategoria()">+ Nueva categoría</button>
+  </div>
+
+  @if (cargando()) {
+    <p class="estado-mensaje">Cargando productos…</p>
+  } @else if (error()) {
+    <p class="estado-mensaje estado-error">No se pudo cargar el inventario: {{ error() }}</p>
+  } @else {
+    <button type="button" class="btn-agregar" (click)="abrirNuevoProducto()">+ Agregar producto</button>
+
+    <div class="productos-grid">
+      @for (producto of productosFiltrados(); track producto.id) {
+        <app-producto-card
+          [nombre]="producto.nombre"
+          [etiqueta]="'$' + producto.precio.toFixed(2) + ' · ' + producto.cantidad + ' en stock'"
+          [mostrarAcciones]="true"
+          (editar)="abrirEditarProducto(producto)"
+          (eliminar)="eliminarProducto(producto)">
+        </app-producto-card>
+      } @empty {
+        <p class="estado-mensaje">No hay productos en esta categoría.</p>
+      }
+    </div>
+  }
+</div>
+
+<app-modal
+  [abierto]="modalProductoAbierto()"
+  [titulo]="productoEditando() ? 'Editar producto' : 'Nuevo producto'"
+  (cerrar)="cerrarModalProducto()">
+  <form class="form-modal" (ngSubmit)="guardarProducto()">
+    <label>
+      Nombre
+      <input type="text" name="nombre" [(ngModel)]="formProducto.nombre" required maxlength="100">
+    </label>
+
+    <label>
+      Categoría
+      <select name="id_categoria" [(ngModel)]="formProducto.id_categoria" required>
+        @for (categoria of categorias(); track categoria.id) {
+          <option [ngValue]="categoria.id">{{ categoria.nombre }}</option>
+        }
+      </select>
+    </label>
+
+    <label>
+      Cantidad
+      <input type="number" name="cantidad" [(ngModel)]="formProducto.cantidad" required min="0" step="1">
+    </label>
+
+    <label>
+      Precio
+      <input type="number" name="precio" [(ngModel)]="formProducto.precio" required min="0.01" step="0.01">
+    </label>
+
+    <label>
+      Código de barras (opcional)
+      <input type="text" name="codigo_barras" [(ngModel)]="formProducto.codigo_barras" maxlength="50">
+    </label>
+
+    <label>
+      Tags (opcional)
+      <input type="text" name="tags" [(ngModel)]="formProducto.tags" maxlength="200">
+    </label>
+
+    @if (formError()) {
+      <p class="form-error">{{ formError() }}</p>
+    }
+
+    <div class="form-acciones">
+      <button type="button" class="form-btn-cancelar" (click)="cerrarModalProducto()">Cancelar</button>
+      <button type="submit" class="form-btn-guardar" [disabled]="guardando() || categorias().length === 0">
+        {{ guardando() ? 'Guardando…' : 'Guardar' }}
+      </button>
+    </div>
+
+    @if (categorias().length === 0) {
+      <p class="form-error">Primero crea una categoría.</p>
+    }
+  </form>
+</app-modal>
+
+<app-modal
+  [abierto]="modalCategoriaAbierto()"
+  [titulo]="categoriaEditando() ? 'Editar categoría' : 'Nueva categoría'"
+  (cerrar)="cerrarModalCategoria()">
+  <form class="form-modal" (ngSubmit)="guardarCategoria()">
+    <label>
+      Nombre
+      <input type="text" name="nombre" [(ngModel)]="formCategoriaNombre" required maxlength="60">
+    </label>
+
+    @if (formError()) {
+      <p class="form-error">{{ formError() }}</p>
+    }
+
+    <div class="form-acciones">
+      <button type="button" class="form-btn-cancelar" (click)="cerrarModalCategoria()">Cancelar</button>
+      <button type="submit" class="form-btn-guardar" [disabled]="guardando()">
+        {{ guardando() ? 'Guardando…' : 'Guardar' }}
+      </button>
+    </div>
+  </form>
+</app-modal>

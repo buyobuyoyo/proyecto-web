@@ -1,0 +1,13 @@
+<div class="empleado-card">
+  @if (mostrarAcciones()) {
+    <div class="empleado-acciones">
+      <button type="button" class="empleado-accion-btn" (click)="editar.emit()" aria-label="Editar empleado">✎</button>
+      <button type="button" class="empleado-accion-btn empleado-accion-eliminar" (click)="eliminar.emit()" aria-label="Eliminar empleado">🗑</button>
+    </div>
+  }
+  <img [src]="foto()" [alt]="nombre()" class="empleado-foto">
+  <span class="empleado-estado" [class.baja]="estado() === 'baja'">{{ estado() }}</span>
+  <p><strong>Nombre:</strong> {{ nombre() }}</p>
+  <p><strong>Cargo:</strong> {{ cargo() }}</p>
+  <p><strong>Rendimiento:</strong> {{ rendimiento() }}%</p>
+</div>

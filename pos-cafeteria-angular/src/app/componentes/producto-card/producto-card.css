@@ -1,0 +1,75 @@
+.producto-card {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  flex: 0 0 120px;
+  width: 120px;
+  border: 1px solid var(--gris-medio);
+  border-radius: 8px;
+  overflow: hidden;
+  background: white;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+.producto-acciones {
+  position: absolute;
+  top: 0.3rem;
+  right: 0.3rem;
+  display: flex;
+  gap: 0.3rem;
+  z-index: 1;
+}
+
+.producto-accion-btn {
+  width: 1.6rem;
+  height: 1.6rem;
+  border: none;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+  font-size: 0.8rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.producto-accion-btn:hover {
+  background: var(--gris-claro);
+}
+
+.producto-accion-eliminar:hover {
+  background: var(--rojo-cancelar);
+  color: white;
+}
+
+.producto-imagen {
+  width: 100%;
+  height: 90px;
+  object-fit: cover;
+  display: block;
+  background: var(--gris-claro);
+}
+
+.producto-nombre {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0.4rem 0.3rem 0.2rem;
+  min-height: 2.2em;
+  line-height: 1.1;
+  font-size: 0.8rem;
+  font-weight: bold;
+  text-align: center;
+  text-transform: uppercase;
+}
+
+.producto-etiqueta {
+  width: 100%;
+  text-align: center;
+  background: var(--negro-badge);
+  color: white;
+  font-size: 0.8rem;
+  padding: 0.3rem 0;
+}

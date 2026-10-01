@@ -1,0 +1,28 @@
+<div class="orden-resumen">
+  <div class="orden-fila orden-encabezado">
+    <span>Nombre</span>
+    <span>Cant.</span>
+    <span>Precio</span>
+    <span>Total</span>
+  </div>
+
+  @for (item of items(); track item.nombre) {
+    <div class="orden-fila">
+      <span>{{ item.nombre }}</span>
+      <span>{{ item.cantidad }}</span>
+      <span>{{ item.precio.toFixed(2) }}</span>
+      <span>{{ (item.cantidad * item.precio).toFixed(2) }}</span>
+    </div>
+  }
+
+  <p class="orden-responsable">{{ etiquetaResponsable() }}: {{ nombreResponsable() }}</p>
+
+  <button type="button" class="btn-cancelar">CANCELAR</button>
+
+  <div class="orden-total">
+    <span>Precio total</span>
+    <strong>{{ total().toFixed(2) }}</strong>
+  </div>
+
+  <button type="button" class="btn-pagar">{{ textoBoton() }}</button>
+</div>

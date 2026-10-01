@@ -1,0 +1,150 @@
+/* You can add global styles to this file, and also import other style files */
+
+:root {
+  --verde-principal: #2fae6a;
+  --verde-oscuro: #23935a;
+  --negro-badge: #1a1a1a;
+  --gris-claro: #e6e6e6;
+  --gris-medio: #cfcfcf;
+  --gris-oscuro: #555;
+  --rojo-cancelar: #e5484d;
+  --texto-principal: #222;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0;
+}
+
+body {
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  color: var(--texto-principal);
+  background: #f5f5f5;
+  overflow-x: hidden;
+}
+
+img {
+  max-width: 100%;
+}
+
+button {
+  cursor: pointer;
+  font-family: inherit;
+}
+
+button:focus-visible,
+input:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--verde-oscuro);
+  outline-offset: 2px;
+}
+
+/* Estados de carga/error reutilizados por las páginas conectadas a Supabase */
+
+.estado-mensaje {
+  color: var(--gris-oscuro);
+  font-style: italic;
+}
+
+.estado-error {
+  color: #b3261e;
+  font-style: normal;
+  font-weight: 600;
+}
+
+/* Botón "+ Agregar ..." reutilizado por las páginas con CRUD */
+
+.btn-agregar {
+  align-self: flex-start;
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 6px;
+  background: var(--verde-principal);
+  color: white;
+  font-weight: 600;
+}
+
+.btn-agregar:hover {
+  background: var(--verde-oscuro);
+}
+
+/* Formularios dentro de <app-modal>, reutilizados por las páginas con CRUD */
+
+.form-modal {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.form-modal label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.form-modal input,
+.form-modal select {
+  padding: 0.6rem 0.7rem;
+  border: 1px solid var(--gris-medio);
+  border-radius: 4px;
+  font-size: 1rem;
+  font-weight: normal;
+}
+
+.form-modal input:focus-visible,
+.form-modal select:focus-visible {
+  border-color: var(--verde-principal);
+}
+
+.form-error {
+  color: #b3261e;
+  font-weight: 600;
+  font-size: 0.85rem;
+  margin: 0;
+}
+
+.form-acciones {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.6rem;
+  margin-top: 0.4rem;
+}
+
+.form-btn-cancelar,
+.form-btn-guardar {
+  padding: 0.6rem 1.2rem;
+  border: none;
+  border-radius: 6px;
+  font-weight: 600;
+}
+
+.form-btn-cancelar {
+  background: var(--gris-medio);
+}
+
+.form-btn-cancelar:hover {
+  background: var(--gris-oscuro);
+  color: white;
+}
+
+.form-btn-guardar {
+  background: var(--verde-principal);
+  color: white;
+}
+
+.form-btn-guardar:hover {
+  background: var(--verde-oscuro);
+}
+
+.form-btn-guardar:disabled {
+  background: var(--gris-medio);
+  color: var(--gris-oscuro);
+  cursor: not-allowed;
+}

@@ -1,0 +1,10 @@
+.contenido {
+  padding: 1.5rem;
+  min-height: calc(100vh - 64px);
+}
+
+@media (max-width: 700px) {
+  .contenido {
+    padding: 1rem;
+  }
+}

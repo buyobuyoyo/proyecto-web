@@ -1,0 +1,93 @@
+<div class="rh-layout">
+  <section class="rh-datos">
+    <p>Número de empleados <strong>{{ numEmpleados() }}</strong></p>
+    <p>Número total requerido de staff <strong>{{ staffRequerido }}</strong></p>
+    <p>Diferencia <strong>{{ diferencia() }}</strong></p>
+    <p>
+      Estado
+      <strong class="estado" [class.understaffed]="estado() === 'Understaffed'" [class.overstaffed]="estado() === 'Overstaffed'">
+        {{ estado() }}
+      </strong>
+    </p>
+    <p>Rendimiento <strong>{{ rendimiento() }}%</strong></p>
+  </section>
+
+  <section class="rh-empleados">
+    @if (cargando()) {
+      <p class="estado-mensaje">Cargando empleados…</p>
+    } @else if (error()) {
+      <p class="estado-mensaje estado-error">No se pudo cargar el personal: {{ error() }}</p>
+    } @else {
+      <button type="button" class="btn-agregar" (click)="abrirNuevoEmpleado()">+ Agregar empleado</button>
+
+      <div class="empleados-grid">
+        @for (empleado of empleados(); track empleado.id) {
+          <app-empleado-card
+            [id]="empleado.id"
+            [nombre]="empleado.nombre"
+            [cargo]="empleado.cargo"
+            [foto]="empleado.foto ?? '/imagenes/logo.png'"
+            [estado]="empleado.estado"
+            [rendimiento]="empleado.rendimiento"
+            [mostrarAcciones]="true"
+            (editar)="abrirEditarEmpleado(empleado)"
+            (eliminar)="eliminarEmpleado(empleado)">
+          </app-empleado-card>
+        } @empty {
+          <p class="estado-mensaje">No hay empleados registrados.</p>
+        }
+      </div>
+    }
+  </section>
+</div>
+
+<app-modal
+  [abierto]="modalAbierto()"
+  [titulo]="empleadoEditando() ? 'Editar empleado' : 'Nuevo empleado'"
+  (cerrar)="cerrarModal()">
+  <form class="form-modal" (ngSubmit)="guardarEmpleado()">
+    <label>
+      Nombre
+      <input type="text" name="nombre" [(ngModel)]="formEmpleado.nombre" required maxlength="100">
+    </label>
+
+    <label>
+      Cargo
+      <input type="text" name="cargo" [(ngModel)]="formEmpleado.cargo" required maxlength="60">
+    </label>
+
+    <label>
+      Estado
+      <select name="estado" [(ngModel)]="formEmpleado.estado" required>
+        <option value="activo">Activo</option>
+        <option value="baja">Baja</option>
+      </select>
+    </label>
+
+    <label>
+      Rendimiento (%)
+      <input type="number" name="rendimiento" [(ngModel)]="formEmpleado.rendimiento" min="0" max="100" step="0.1">
+    </label>
+
+    <label>
+      Fecha de alta
+      <input type="date" name="fecha_alta" [(ngModel)]="formEmpleado.fecha_alta" required>
+    </label>
+
+    <label>
+      Foto (URL, opcional)
+      <input type="text" name="foto" [(ngModel)]="formEmpleado.foto" maxlength="255">
+    </label>
+
+    @if (formError()) {
+      <p class="form-error">{{ formError() }}</p>
+    }
+
+    <div class="form-acciones">
+      <button type="button" class="form-btn-cancelar" (click)="cerrarModal()">Cancelar</button>
+      <button type="submit" class="form-btn-guardar" [disabled]="guardando()">
+        {{ guardando() ? 'Guardando…' : 'Guardar' }}
+      </button>
+    </div>
+  </form>
+</app-modal>

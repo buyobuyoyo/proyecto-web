@@ -1,0 +1,49 @@
+.container {
+                border-radius: 10%;
+                height: 100%;
+                border-width:7px;
+                border-style:solid;
+                border-image: url("https://foollovers.com/mat/baf/food/fo32-008-a.gif") 7 fill round; 
+                padding: 10px;
+                margin-bottom: 10px;
+                overflow: auto;
+}
+
+
+h1{
+                text-align: center;
+                font-family: Basiic, sans-serif;
+                font-size: small;
+                height: 15px;
+                margin-bottom: 7px;
+                padding-left: 5px;
+                text-shadow: 0 0 3px black;
+                border-radius: 4px;
+                background: linear-gradient(180deg, #fff9f0 0%, #ebdcc6 45%,  47%, #ebdcc6 60%, #fff9f0 100%);
+                border: solid 2px #b89f7a;
+                filter: 
+                drop-shadow(0 0.5px 0 #b89f7a) 
+                drop-shadow(0 0.5px 0 #b89f7a) 
+                drop-shadow(0 0.5px 0.5px #b89f7a) 
+                drop-shadow(0.5px 0.5px 1px #b89f7a)
+                drop-shadow(-0.5px 0.5px 0 #b89f7a)
+                drop-shadow(0 0.5px 0 black) 
+                drop-shadow(0 0.5px 0 black);
+                        color: #4a2c11;
+}
+
+.gallery-container {
+  height: auto;
+  border: ridge 4px #5e3023;
+  background-image: url('/fondos/sheet2.jpg');
+  padding: 5px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  gap: 10px;
+
+}
+
+
+

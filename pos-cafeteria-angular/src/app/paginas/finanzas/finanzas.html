@@ -1,0 +1,121 @@
+@if (cargando()) {
+  <p class="estado-mensaje">Cargando finanzas…</p>
+} @else if (error()) {
+  <p class="estado-mensaje estado-error">No se pudo cargar la información: {{ error() }}</p>
+} @else {
+  <div class="finanzas-layout">
+    <section class="finanzas-izquierda">
+      <div class="finanzas-totales">
+        <p>Gastos en insumos (Totales): <strong>${{ totales().insumos.toFixed(2) }}</strong></p>
+        <p>Gastos en personal (Totales): <strong>${{ totales().personal.toFixed(2) }}</strong></p>
+        <p>Ventas (Totales): <strong>${{ totales().ventas.toFixed(2) }}</strong></p>
+      </div>
+
+      <div class="finanzas-scrollbox">
+        @for (dia of finanzasPorDia(); track dia.fecha) {
+          <div class="finanzas-dia">
+            <p class="finanzas-fecha">Fecha: {{ dia.fecha }}</p>
+            <p>Gastos en insumos: {{ dia.insumos.toFixed(2) }}</p>
+            <p>Gastos en personal: {{ dia.personal.toFixed(2) }}</p>
+            <p>Ventas: {{ dia.ventas.toFixed(2) }}</p>
+          </div>
+        } @empty {
+          <p class="estado-mensaje">Todavía no hay movimientos registrados.</p>
+        }
+      </div>
+    </section>
+
+    <section class="finanzas-derecha">
+      <h3>Gráficos</h3>
+      <div class="grafico-barras">
+        <div class="barra-grupo">
+          <div class="barra barra-insumos" [style.height.%]="(totales().insumos / maxTotal()) * 100"></div>
+          <span>Insumos</span>
+        </div>
+        <div class="barra-grupo">
+          <div class="barra barra-personal" [style.height.%]="(totales().personal / maxTotal()) * 100"></div>
+          <span>Personal</span>
+        </div>
+        <div class="barra-grupo">
+          <div class="barra barra-ventas" [style.height.%]="(totales().ventas / maxTotal()) * 100"></div>
+          <span>Ventas</span>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <section class="movimientos-seccion">
+    <div class="movimientos-header">
+      <h3>Movimientos</h3>
+      <button type="button" class="btn-agregar" (click)="abrirNuevoRegistro()">+ Agregar movimiento</button>
+    </div>
+    <p class="estado-mensaje"></p>
+
+    <div class="movimientos-lista">
+      <div class="movimiento-fila movimiento-encabezado">
+        <span>Fecha</span>
+        <span>Tipo</span>
+        <span>Monto</span>
+        <span>Origen</span>
+        <span></span>
+      </div>
+
+      @for (registro of registros(); track registro.id) {
+        <div class="movimiento-fila">
+          <span>{{ registro.fecha }}</span>
+          <span class="movimiento-tipo" [class]="'tipo-' + registro.tipo">{{ registro.tipo }}</span>
+          <span>${{ registro.monto.toFixed(2) }}</span>
+          <span>{{ registro.origen ?? '—' }}</span>
+          <span class="movimiento-acciones">
+            <button type="button" class="movimiento-accion" (click)="abrirEditarRegistro(registro)" aria-label="Editar movimiento">✎</button>
+            <button type="button" class="movimiento-accion" (click)="eliminarRegistro(registro)" aria-label="Eliminar movimiento">🗑</button>
+          </span>
+        </div>
+      } @empty {
+        <p class="estado-mensaje">No hay movimientos registrados.</p>
+      }
+    </div>
+  </section>
+}
+
+<app-modal
+  [abierto]="modalAbierto()"
+  [titulo]="registroEditando() ? 'Editar movimiento' : 'Nuevo movimiento'"
+  (cerrar)="cerrarModal()">
+  <form class="form-modal" (ngSubmit)="guardarRegistro()">
+    <label>
+      Tipo
+      <select name="tipo" [(ngModel)]="formRegistro.tipo" required>
+        <option value="ingreso_venta">Ingreso por venta</option>
+        <option value="gasto_insumo">Gasto en insumo</option>
+        <option value="gasto_personal">Gasto en personal</option>
+      </select>
+    </label>
+
+    <label>
+      Fecha
+      <input type="date" name="fecha" [(ngModel)]="formRegistro.fecha" required>
+    </label>
+
+    <label>
+      Monto
+      <input type="number" name="monto" [(ngModel)]="formRegistro.monto" required min="0.01" step="0.01">
+    </label>
+
+    <label>
+      Origen (opcional)
+      <input type="text" name="origen" [(ngModel)]="formRegistro.origen" maxlength="100" placeholder="Ej. Nómina quincenal">
+    </label>
+
+    @if (formError()) {
+      <p class="form-error">{{ formError() }}</p>
+    }
+
+    <div class="form-acciones">
+      <button type="button" class="form-btn-cancelar" (click)="cerrarModal()">Cancelar</button>
+      <button type="submit" class="form-btn-guardar" [disabled]="guardando()">
+        {{ guardando() ? 'Guardando…' : 'Guardar' }}
+      </button>
+    </div>
+  </form>
+</app-modal>

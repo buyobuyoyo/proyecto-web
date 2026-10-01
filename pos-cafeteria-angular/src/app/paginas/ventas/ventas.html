@@ -1,0 +1,119 @@
+<div class="ventas-layout">
+  @if (cargando()) {
+    <p class="estado-mensaje">Cargando ventas…</p>
+  } @else if (error()) {
+    <p class="estado-mensaje estado-error">No se pudo cargar la información: {{ error() }}</p>
+  } @else {
+    <div class="ventas-header">
+      <h3>Ventas</h3>
+      <button type="button" class="btn-agregar" (click)="abrirNuevaVenta()">+ Agregar venta</button>
+    </div>
+
+    <div class="ventas-lista">
+      <div class="venta-fila venta-encabezado">
+        <span>Fecha</span>
+        <span>Cajero</span>
+        <span>Total</span>
+        <span>Pago</span>
+        <span>Estado</span>
+        <span></span>
+      </div>
+
+      @for (venta of ventas(); track venta.id) {
+        <div class="venta-fila">
+          <span>{{ venta.fecha | slice: 0:10 }}</span>
+          <span>{{ venta.empleado?.nombre ?? '—' }}</span>
+          <span>${{ venta.total.toFixed(2) }}</span>
+          <span>{{ venta.metodo_pago ?? '—' }}</span>
+          <span class="venta-estado" [class]="'estado-' + venta.estado">{{ venta.estado }}</span>
+          <span class="venta-acciones">
+            <button type="button" class="venta-accion" (click)="abrirEditarVenta(venta)" aria-label="Editar venta">✎</button>
+            <button type="button" class="venta-accion" (click)="eliminarVenta(venta)" aria-label="Eliminar venta">🗑</button>
+          </span>
+        </div>
+      } @empty {
+        <p class="estado-mensaje">No hay ventas registradas.</p>
+      }
+    </div>
+  }
+</div>
+
+<app-modal
+  [abierto]="modalVentaAbierto()"
+  [titulo]="ventaEditando() ? 'Editar venta' : 'Nueva venta'"
+  (cerrar)="cerrarModal()">
+  <form class="form-modal form-venta" (ngSubmit)="guardarVenta()">
+    <label>
+      Cajero / encargado
+      <select name="id_empleado" [(ngModel)]="formVenta.id_empleado" required>
+        @for (empleado of empleados(); track empleado.id) {
+          <option [ngValue]="empleado.id">{{ empleado.nombre }}</option>
+        }
+      </select>
+    </label>
+
+    <label>
+      Método de pago
+      <select name="metodo_pago" [(ngModel)]="formVenta.metodo_pago" required>
+        <option value="efectivo">Efectivo</option>
+        <option value="tarjeta">Tarjeta</option>
+      </select>
+    </label>
+
+    <label>
+      Estado
+      <select name="estado" [(ngModel)]="formVenta.estado" required>
+        <option value="confirmada">Confirmada</option>
+        <option value="cancelada">Cancelada</option>
+        <option value="devuelta">Devuelta</option>
+      </select>
+    </label>
+
+    <div class="lineas-compra">
+      <div class="linea-fila linea-encabezado">
+        <span>Producto</span>
+        <span>Cantidad</span>
+        <span>Precio unit.</span>
+        <span></span>
+      </div>
+
+      @for (linea of lineas(); track $index) {
+        <div class="linea-fila">
+          <select [(ngModel)]="linea.id_producto" [name]="'producto' + $index" (ngModelChange)="autocompletarPrecio($index)" required>
+            <option [ngValue]="null" disabled>Selecciona…</option>
+            @for (producto of productos(); track producto.id) {
+              <option [ngValue]="producto.id">{{ producto.nombre }}</option>
+            }
+          </select>
+          <input type="number" [(ngModel)]="linea.cantidad" [name]="'cantidad' + $index" min="1" step="1" required>
+          <input type="number" [(ngModel)]="linea.precio_unitario" [name]="'precio' + $index" min="0" step="0.01" required>
+          <button type="button" class="linea-quitar" (click)="quitarLinea($index)" aria-label="Quitar línea" [disabled]="lineas().length === 1">×</button>
+        </div>
+      }
+
+      <button type="button" class="linea-agregar" (click)="agregarLinea()">+ Agregar línea</button>
+    </div>
+
+    <label>
+      Descuento
+      <input type="number" name="descuento" [(ngModel)]="formVenta.descuento" min="0" step="0.01">
+    </label>
+
+    <div class="venta-resumen">
+      <span>Subtotal <strong>${{ subtotalVenta().toFixed(2) }}</strong></span>
+      <span>Descuento <strong>${{ (formVenta.descuento || 0).toFixed(2) }}</strong></span>
+      <span class="venta-total-final">Total <strong>${{ totalVenta().toFixed(2) }}</strong></span>
+    </div>
+
+    @if (formError()) {
+      <p class="form-error">{{ formError() }}</p>
+    }
+
+    <div class="form-acciones">
+      <button type="button" class="form-btn-cancelar" (click)="cerrarModal()">Cancelar</button>
+      <button type="submit" class="form-btn-guardar" [disabled]="guardando()">
+        {{ guardando() ? 'Guardando…' : 'Guardar' }}
+      </button>
+    </div>
+  </form>
+</app-modal>

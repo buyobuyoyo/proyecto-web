@@ -1,0 +1,607 @@
+           /* Used sadgrl layout maker */
+           
+::-webkit-scrollbar {
+width: 16px
+}
+::-webkit-scrollbar-corner {
+background: #eee
+}
+ 
+::-webkit-scrollbar-track:vertical {
+background: linear-gradient(90deg, #e5e5e5, #f0f0f0 20%);
+}
+ 
+::-webkit-scrollbar-thumb {
+border: 1.5px solid #888;
+border-radius: 3px;
+box-shadow: inset 0 -1px 1px #fff, inset 0 1px 1px #fff;
+background-color: #eee;
+}
+::-webkit-scrollbar-thumb:vertical {
+background: url("https://dl.dropbox.com/s/9a29qbkza3gmgl7/scroll1.png"), linear-gradient(90deg, #eee 45%, #ddd 0, #bbb);
+background-repeat: no-repeat;
+background-size: 65% auto, cover;
+background-position: center;
+}
+ 
+::-webkit-scrollbar-button:vertical:end:increment,
+::-webkit-scrollbar-button:vertical:start:decrement {
+display: block
+}
+ 
+::-webkit-scrollbar-button:vertical {
+height: 15px
+}
+::-webkit-scrollbar-button:vertical:start:decrement {
+background: white;
+background: url("https://dl.dropbox.com/s/n9ji42h9hdgdtpc/scroll3.png"), linear-gradient(90deg, #e5e5e5, #f0f0f0 20%);
+background-repeat: no-repeat;
+background-position: center;
+-moz-background-size: 100% auto, cover;
+-webkit-background-size: 100% auto, cover;
+-o-background-size: 100% auto, cover;
+background-size: 100% auto, cover;
+background-position: center;
+border-radius: 0 3px 0 0;
+}
+ 
+::-webkit-scrollbar-button:vertical:start:increment {
+display: none;
+}
+::-webkit-scrollbar-button:vertical:end:decrement {
+display: none;
+}
+ 
+::-webkit-scrollbar-button:vertical:end:increment {
+background: white;
+background: url("https://dl.dropbox.com/s/cdcco6pih7n1lae/scroll4.png"), linear-gradient(90deg, #e5e5e5, #f0f0f0 20%);
+background-repeat: no-repeat;
+background-position: center;
+-moz-background-size: 100% auto, cover;
+-webkit-background-size: 100% auto, cover;
+-o-background-size: 100% auto, cover;
+background-size: 100% auto, cover;
+background-position: center;
+border-radius: 0 0 3px 0;
+}
+
+#topborder {
+    background-image: url(/fondos/border-lace-brown.png);
+    background-repeat: repeat-x;
+    height: 20px;
+    top: -4px;
+    z-index: 99999999;
+    position: relative;
+}
+           /*scrollbar v2*/
+/* Chess - Knight Piece - https://www.cursors-4u.com/cursor/spo146 */
+* {
+  cursor: url('https://cdn.cursors-4u.net/previews/chess-knight-piece-3b5e132c-32.webp') 32 32, auto !important;
+}
+/* End www.Cursors-4U.com Code */
+
+
+           
+           * {
+                box-sizing: border-box;
+                /* outline: solid 1px lime; */
+            }
+
+            :root {
+                --header-image: url('../public/imagenes/header-image-books.png');
+                --body-bg-image: url('../public/fondos/pattern 325_chess.gif');
+            }
+
+            @font-face {
+                font-family: Basiic;
+                src: url('/fuentes/Basiic.ttf');
+                
+            }
+            @font-face {
+                font-family: LexendMega;
+                src: url('/fuentes/LexendMega.ttf');
+            }
+            @font-face {
+                font-family: DotGothic16;
+                src: url('/fuentes/DotGothic16.ttf');
+            }
+            @font-face {
+                font-family: HachiMaruPop;
+                src: url('/fuentes/HachiMaruPop.ttf');
+            }
+             @font-face {
+                font-family: NotoSansJP;
+                src: url('/fuentes/NotoSansJP.ttf');
+            }
+             @font-face {
+                font-family: PressStart2P;
+                src: url('/fuentes/PressStart2P.ttf');
+            }
+             @font-face {
+                font-family: Sacramento;
+                src: url('/fuentes/Sacramento.ttf');
+            }
+             @font-face {
+                font-family: Yoster;
+                src: url('/fuentes/Yoster.ttf');
+            }
+             @font-face {
+                font-family: ZenMaruGothic;
+                src: url('/fuentes/ZenMaruGothic.ttf');
+            }
+
+
+            body {
+                margin: 0;
+                /* you can delete the line below if you'd prefer to not use an image */
+                background-size: 100px;
+                color: #fceaff; /*text*/
+                background-image: var(--body-bg-image);
+            }
+
+
+            #container {
+                outline: ridge 4px #5e3023;
+                width: 900px;
+                margin: 5vh auto;
+                height: 1175px;
+                border-radius: 200px 0px 0px 0px; 
+                padding: 10px;
+                background-image: url(../public/fondos/WALNUT3.png);
+                transition: transform 0.3s ease;
+            }
+
+            .navlink {
+                margin-left: 10px;
+                color: #5e3023;
+           
+            }
+
+            .navlink:hover {
+                color: #a49cba;
+              
+            }
+
+            #header {
+                width: 100%;
+                height: 200px;
+                border-radius: 200px 0px 0px 0px; 
+                background-image: var(--header-image);
+                background-size: 100%;
+                margin-bottom: 50px;
+                position: relative;
+            }
+
+            
+            #pof{
+                height: 230px;
+                z-index: 10;
+                position: absolute;
+                top:50px;
+            }
+
+            #pof2{
+                height: 270px;
+                position: absolute;
+                z-index: 10;
+                right: 60px;
+                top: -70px;
+            }
+
+            #navbar {
+                height: 40px;
+                background-color: #895737;
+                width: 100%;
+            }
+
+            #navbar ul {
+                display: flex;
+                padding: 0;
+                margin: 0;
+                list-style-type: none;
+                justify-content: space-evenly;
+            }
+
+            #navbar li {
+                padding-top: 10px;
+            }
+
+            #navbar li a {
+                color: #5e3023;
+                font-weight: 800;
+                text-decoration: none;
+                /* this removes the underline */
+            }
+
+            
+
+     /* navigation link when a link is hovered over */
+            #navbar li a:hover {
+                color: #a49cba;
+                text-decoration: underline;
+            }
+
+            #flex {
+                display: flex;
+            }
+
+    /* this colors BOTH sidebars
+    if you want to style them separately,
+    create styles for #leftSidebar and #rightSidebar */
+            aside {
+                background-image: url(../public/fondos/wintersweater195.jpg);
+                width: 200px;
+                font-size: smaller;
+                padding: 5px;  
+                border: ridge 4px #5e3023;
+                border-radius: 15px;
+                /* this makes the sidebar text slightly smaller */
+            }
+
+
+          
+
+   /*
+    if you're using both sidebars, the "order" value
+    tells the CSS the order in which to display them.
+*/
+            #leftSidebar {
+                position: relative;
+                order: 1;
+                height: 820px;
+                margin-right: 15px;
+            }
+
+            #buttonholder{
+                border-radius: 10%;
+                height: 110px;
+                border-width: 7px; 
+                border-style: solid;
+                border-image: url("https://i.imgur.com/8xftJ3v.gif") 7 fill round;         
+            }
+
+
+            .btn{
+                margin: 2px;
+            }
+    
+            .marqueegif{
+                margin: 2px;
+            }
+
+            #innerbuttonholder textarea{
+                
+                width: 80%;
+                
+            }
+
+            #innerbuttonholder{
+                background-image: url(../public/fondos/sheet2.jpg);
+                padding: 5px;
+                border: ridge 4px #5e3023;
+                border-radius: 5px;
+                height: 100%;
+            }
+
+            #neighborsouter{
+                border-width: 15px; 
+                border-style: solid;
+                border-image: url("../public/borders/marco-dorado.png") 23 fill round;       
+                height: 290px;
+            }
+
+            #neighborsmid{
+                border: ridge 4px #5e3023;
+                border-radius: 5px;
+                height: 100%;
+                width: 100%;
+                padding: 5px;
+                background-image: url(../public/fondos/sheet2.jpg);
+                overflow-y: auto;
+            }
+            
+            /* .ough {
+                    filter: brightness(75%) sepia(1) hue-rotate(-34deg) saturate(76.3%) brightness(154.3%);
+                    transition: filter 0.25s ease;
+                    height: 31px;
+                    width: 88px;
+                    max-width: 50%;
+            }
+
+            .ough:hover {
+                    filter: none;
+            } */
+                        
+
+
+            /* #shirlulu2{
+                z-index: 10;
+                position: absolute;
+                height: 250px;
+                right: -150px;
+                top: 280px;
+                pointer-events: none;   
+                transform: rotate(15deg);
+            } */
+
+            #nav{
+                border-radius: 10%;
+                height: 310px;
+                border-width:7px;
+                border-style:solid;
+                border-image: url("https://foollovers.com/mat/baf/food/fo32-008-a.gif") 7 fill round; 
+                padding: 5px;
+                margin-bottom: 10px;
+            }
+
+            #leftSidebar h1{
+                text-align: center;
+                font-family: Basiic, sans-serif;
+                font-size: small;
+                height: 15px;
+                margin: 5px;
+                margin-bottom: 7px;
+                padding-left: 5px;
+                text-shadow: 0 0 3px black;
+                color: white;
+                border-radius: 4px;
+                background: linear-gradient(180deg, #fff9f0 0%, #ebdcc6 45%,  47%, #ebdcc6 60%, #fff9f0 100%);
+                border: solid 2px #b89f7a;
+                filter: 
+                drop-shadow(0 0.5px 0 #b89f7a) 
+                drop-shadow(0 0.5px 0 #b89f7a) 
+                drop-shadow(0 0.5px 0.5px #b89f7a) 
+                drop-shadow(0.5px 0.5px 1px #b89f7a)
+                drop-shadow(-0.5px 0.5px 0 #b89f7a)
+                drop-shadow(0 0.5px 0 black) 
+                drop-shadow(0 0.5px 0 black);
+                        color: #4a2c11;
+            }
+
+            #innernav{
+                border: ridge 4px #5e3023;
+                border-radius: 5px;
+                height: 100%;
+                width: 100%;
+                text-decoration: underline;
+                text-decoration-color: #4a2c11;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                background-image: url(../public/fondos/sheet2.jpg);
+            }
+
+            .link {
+                width: 90%;
+                margin: 10px;
+                margin:4px;
+                border-radius: 4px;
+                background: linear-gradient(180deg,
+                #fff9f0 0%,
+                #ebdcc6 45%, 47%, 
+                #ebdcc6 60%,
+                #fff9f0 100%);
+
+                border: solid 2px #b89f7a;
+                filter: drop-shadow(0 0.5px 0 #b89f7a) 3
+                drop-shadow(0 0.5px 0 #b89f7a) 
+                drop-shadow(0 0.5px 0.5px #b89f7a) 
+                drop-shadow(0.5px 0.5px 1px #b89f7a)
+                drop-shadow(-0.5px 0.5px 0 black)
+                drop-shadow(0 0.5px 0 black) 
+                drop-shadow(0 0.5px 0 black);
+                        color: #4a2c11;
+                        padding: 5px;
+            }
+
+            .dude {
+                height:20px;
+                filter: 
+                drop-shadow(0 0.5px 0 gray) 
+                drop-shadow(0 0.5px 0 gray) 
+                drop-shadow(0 0.5px 0.5px gray)
+                drop-shadow(0.5px 0.5px 1px gray) 
+                drop-shadow(-0.5px 0.5px 0 black) 
+                drop-shadow(0 0.5px 0 black) 
+                drop-shadow(0 0.5px 0 black);
+
+            }
+
+              main {
+                background-color: #C08552;
+                max-height: 815px;
+                flex: 1;
+                padding: 15px;
+                order: 2;
+                border-radius: 15px;
+                outline: ridge 4px #5e3023;
+                background-image: url(../public/fondos/wintersweater195.jpg);
+            }
+
+            #rightSidebar {
+                
+                align-items: center;
+                order: 3;
+                margin-left: 15px;
+                min-width: 300px;
+                height:820px;
+            }
+
+             #rightSidebar h1{
+                text-align: center;
+                font-family: Basiic, sans-serif;
+                font-size: small;
+                height: 15px;
+                margin: 5px;
+                margin-bottom: 7px;
+                padding-left: 5px;
+                text-shadow: 0 0 3px black;
+                border-radius: 4px;
+                background: linear-gradient(180deg, #fff9f0 0%, #ebdcc6 45%,  47%, #ebdcc6 60%, #fff9f0 100%);
+                border: solid 2px #b89f7a;
+                filter: 
+                drop-shadow(0 0.5px 0 #b89f7a) 
+                drop-shadow(0 0.5px 0 #b89f7a) 
+                drop-shadow(0 0.5px 0.5px #b89f7a) 
+                drop-shadow(0.5px 0.5px 1px #b89f7a)
+                drop-shadow(-0.5px 0.5px 0 #b89f7a)
+                drop-shadow(0 0.5px 0 black) 
+                drop-shadow(0 0.5px 0 black);
+                        color: #4a2c11;
+            }
+
+
+            #cbox-container{
+                border-radius: 10%;
+                height: 155px;
+                border-width: 7px; 
+                border-style: solid;
+                border-image: url("https://i.imgur.com/8xftJ3v.gif") 7 fill round;     
+                 margin-bottom: 10px;
+            }
+
+             #innercbox-container{
+                border: ridge 4px #5e3023;
+                border-radius: 2px;
+                height: 100%;
+                border-style: solid;
+                overflow-y: auto;
+                overflow-x: hidden;
+            }
+
+            #status{
+                border-width: 15px; 
+                border-style: solid;
+                border-image: url("../public/borders/marco-dorado.png") 23 fill round;       
+                height: 150px;
+                margin-bottom: 10px;
+            }
+
+            #statusinner {
+                font-size: smaller;
+                position: relative;
+                height: 100%;
+                padding: 0;
+                text-align: center;
+            }
+
+            #statusinner img {
+                width: 100%;
+                height: 100%;
+                display: block;
+                position: relative;
+                z-index: 1; 
+            }
+
+            #statusinner span, 
+            #statusinner p{
+                font-family: DotGothic16, sans-serif;
+                text-decoration: underline;
+                font-size: smaller;
+                color: #776336;
+                letter-spacing: 2px;
+            }
+            #statusinner h3 {
+                position: absolute;
+                z-index: 10; 
+                color: #4a2c11;
+                margin: 0;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                white-space: nowrap;
+            }
+
+
+            .marquee-container{
+                background-image: url(../public/fondos/chessboard.jpg);
+                background-size: cover;
+                padding: 5px;
+                border: ridge 4px #5e3023;
+                border-radius: 5px;
+                height: 80px;
+
+            }
+            
+            .stampmarquee{
+                    width:403px;
+                    border:0px solid;
+                    height:auto;
+                    margin-left:10px;
+                    padding:1px;
+                    top:686px;
+                    position:absolute;
+                    left:265px;
+                    overflow:hidden;
+            }
+
+            .winampholder {
+                background-image: url(../public/fondos/sheet2.jpg);
+                width: 285px;
+                height: 350px;
+                margin-top: 10px;
+                border: ridge 4px #5e3023;
+                color:#000;
+                padding: 5px;
+                text-align: center;
+            }
+
+
+
+
+            
+
+         #footerouter{
+
+                border-width:7px;
+                border-style:solid;
+                border-image: url("https://foollovers.com/mat/baf/food/fo32-008-a.gif") 7 fill round; 
+
+                padding: 0px;
+                width: 100%;
+                height: 73px;
+                padding: 10px;
+                position:relative
+         }
+
+            footer {
+                border-width: 7px; 
+                border-style: solid;
+                border-image: url("https://i.imgur.com/8xftJ3v.gif") 7 fill round;           
+                padding: 5px;
+                width: 100%;
+                height: 60px;
+                padding: 10px;
+            
+                position: absolute;
+                inset: 0;
+            }
+
+            #footerinner {
+                text-align: center;
+                outline: dashed 1px #5e3023;
+                border-radius: 5px;
+                height: 100%;
+                width: 100%;
+                padding: 10px;
+                color: #4a2c11;
+                font-family: Basiic, sans-serif;
+                font-size: smaller;
+                
+                
+            }
+
+            h1 {
+                font-size: 25px;
+            }
+
+            strong {
+                /* this styles bold text */
+                color: #000;
+            }
+
+ 
+            
+
+
+

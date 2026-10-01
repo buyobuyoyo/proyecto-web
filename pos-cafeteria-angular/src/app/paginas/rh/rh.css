@@ -1,0 +1,59 @@
+.rh-layout {
+  display: flex;
+  gap: 1.5rem;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.rh-datos {
+  flex: 1;
+  width: 100%;
+  max-width: 320px;
+  border: 1px solid var(--gris-medio);
+  border-radius: 8px;
+  padding: 1.2rem;
+  background: white;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+}
+
+.rh-empleados {
+  flex: 2;
+  min-width: 280px;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.empleados-grid {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.rh-datos p {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 0.4rem;
+  border-bottom: 1px solid var(--gris-claro);
+  padding: 0.5rem 0;
+  margin: 0;
+}
+
+.estado.understaffed {
+  color: var(--rojo-cancelar);
+}
+
+.estado.overstaffed {
+  color: var(--verde-oscuro);
+}
+
+@media (max-width: 700px) {
+  .rh-layout {
+    flex-direction: column;
+  }
+
+  .rh-datos {
+    max-width: 100%;
+  }
+}

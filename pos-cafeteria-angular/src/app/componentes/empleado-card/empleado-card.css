@@ -1,0 +1,73 @@
+.empleado-card {
+  position: relative;
+  width: 220px;
+  max-width: 100%;
+  border: 1px solid var(--gris-medio);
+  border-radius: 8px;
+  padding: 1rem;
+  background: white;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  text-align: center;
+}
+
+.empleado-acciones {
+  position: absolute;
+  top: 0.5rem;
+  right: 0.5rem;
+  display: flex;
+  gap: 0.3rem;
+}
+
+.empleado-accion-btn {
+  width: 1.6rem;
+  height: 1.6rem;
+  border: none;
+  border-radius: 50%;
+  background: var(--gris-claro);
+  font-size: 0.8rem;
+  line-height: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.empleado-accion-btn:hover {
+  background: var(--gris-medio);
+}
+
+.empleado-accion-eliminar:hover {
+  background: var(--rojo-cancelar);
+  color: white;
+}
+
+.empleado-estado {
+  display: inline-block;
+  margin-bottom: 0.5rem;
+  padding: 0.15rem 0.6rem;
+  border-radius: 12px;
+  background: var(--verde-principal);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+}
+
+.empleado-estado.baja {
+  background: var(--rojo-cancelar);
+}
+
+.empleado-foto {
+  width: 90px;
+  height: 90px;
+  border-radius: 50%;
+  background: var(--gris-claro);
+  object-fit: cover;
+  display: block;
+  margin: 0 auto 0.8rem;
+}
+
+.empleado-card p {
+  margin: 0.3rem 0;
+  text-align: left;
+  font-size: 0.9rem;
+}
