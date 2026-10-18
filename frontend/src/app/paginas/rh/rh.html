@@ -1,0 +1,37 @@
+<div class="rh-layout">
+  <section class="rh-datos">
+    <p>Número de empleados <strong>{{ numEmpleados() }}</strong></p>
+    <p>Número total requerido de staff <strong>{{ staffRequerido }}</strong></p>
+    <p>Diferencia <strong>{{ diferencia() }}</strong></p>
+    <p>
+      Estado
+      <strong class="estado" [class.understaffed]="estado() === 'Understaffed'" [class.overstaffed]="estado() === 'Overstaffed'">
+        {{ estado() }}
+      </strong>
+    </p>
+    <p>Rendimiento <strong>{{ rendimiento() }}%</strong></p>
+  </section>
+
+  <section class="rh-empleados">
+    @if (cargando()) {
+      <p class="estado-mensaje">Cargando empleados…</p>
+    } @else if (error()) {
+      <p class="estado-mensaje estado-error">No se pudo cargar el personal: {{ error() }}</p>
+    } @else {
+      <div class="empleados-grid">
+        @for (empleado of empleados(); track empleado.id) {
+          <app-empleado-card
+            [id]="empleado.id"
+            [nombre]="empleado.nombre"
+            [cargo]="empleado.cargo"
+            [foto]="empleado.foto ?? '/imagenes/logo.png'"
+            [estado]="empleado.estado"
+            [rendimiento]="empleado.rendimiento">
+          </app-empleado-card>
+        } @empty {
+          <p class="estado-mensaje">No hay empleados registrados.</p>
+        }
+      </div>
+    }
+  </section>
+</div>
