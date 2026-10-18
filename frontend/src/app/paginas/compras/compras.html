@@ -1,9 +1,11 @@
 <div class="compras-layout">
+  <!-- Tres estados posibles: cargando, error o la página con datos. -->
   @if (cargando()) {
     <p class="estado-mensaje">Cargando compras…</p>
   } @else if (error()) {
     <p class="estado-mensaje estado-error">No se pudo cargar la información: {{ error() }}</p>
   } @else {
+    <!-- Sección de proveedores: una "píldora" por proveedor con sus acciones. -->
     <section class="proveedores-seccion">
       <h3>Proveedores</h3>
       <div class="proveedores-lista">
@@ -20,13 +22,15 @@
       </div>
     </section>
 
+    <!-- Sección de órdenes de compra: tabla con todas las compras. -->
     <section class="compras-seccion">
       <div class="compras-header">
         <h3>Órdenes de compra</h3>
         <button type="button" class="btn-agregar" (click)="abrirNuevaCompra()">+ Agregar compra</button>
       </div>
 
-      <div class="compras-lista">
+      <div class="compras-lista lista-tarjeta">
+        <!-- Fila de encabezados de columna (se oculta en pantallas pequeñas). -->
         <div class="compra-fila compra-encabezado">
           <span>Fecha</span>
           <span>Proveedor</span>
@@ -38,8 +42,10 @@
         @for (compra of compras(); track compra.id) {
           <div class="compra-fila">
             <span>{{ compra.fecha }}</span>
+            <!-- `?.` y `??`: si la compra no tiene proveedor (null) se muestra "—" en lugar de fallar. -->
             <span>{{ compra.proveedor?.nombre ?? '—' }}</span>
             <span>${{ compra.total.toFixed(2) }}</span>
+            <!-- [class]="'estado-' + ..." pone una clase distinta según el estado (color de la etiqueta). -->
             <span class="compra-estado" [class]="'estado-' + compra.estado">{{ compra.estado }}</span>
             <span class="compra-acciones">
               <button type="button" class="proveedor-accion" (click)="abrirEditarCompra(compra)" aria-label="Editar compra">✎</button>
@@ -54,6 +60,8 @@
   }
 </div>
 
+<!-- Modal de proveedor (crear/editar). El título cambia según `proveedorEditando`.
+     [(ngModel)] enlaza cada campo con `formProveedor` en ambos sentidos. -->
 <app-modal
   [abierto]="modalProveedorAbierto()"
   [titulo]="proveedorEditando() ? 'Editar proveedor' : 'Nuevo proveedor'"
@@ -82,6 +90,7 @@
   </form>
 </app-modal>
 
+<!-- Modal de compra (crear/editar): encabezado + líneas de productos + total. -->
 <app-modal
   [abierto]="modalCompraAbierto()"
   [titulo]="compraEditando() ? 'Editar compra' : 'Nueva compra'"
@@ -91,6 +100,7 @@
       Proveedor
       <select name="id_proveedor" [(ngModel)]="formCompra.id_proveedor" required>
         @for (proveedor of proveedores(); track proveedor.id) {
+          <!-- [ngValue] guarda el número real (id) y no un texto, como haría `value`. -->
           <option [ngValue]="proveedor.id">{{ proveedor.nombre }}</option>
         }
       </select>
@@ -110,6 +120,7 @@
       </select>
     </label>
 
+    <!-- Líneas de la compra: una fila por producto. -->
     <div class="lineas-compra">
       <div class="linea-fila linea-encabezado">
         <span>Producto</span>
@@ -118,8 +129,11 @@
         <span></span>
       </div>
 
+      <!-- `track $index`: las líneas no tienen id propio, así que se identifican por su posición.
+           Cada campo necesita un `name` único dentro del <form> (por eso 'producto' + $index). -->
       @for (linea of lineas(); track $index) {
         <div class="linea-fila">
+          <!-- (ngModelChange) se dispara al elegir un producto: rellena su precio automáticamente. -->
           <select [(ngModel)]="linea.id_producto" [name]="'producto' + $index" (ngModelChange)="autocompletarPrecio($index)" required>
             <option [ngValue]="null" disabled>Selecciona…</option>
             @for (producto of productos(); track producto.id) {
@@ -128,6 +142,7 @@
           </select>
           <input type="number" [(ngModel)]="linea.cantidad" [name]="'cantidad' + $index" min="1" step="1" required>
           <input type="number" [(ngModel)]="linea.precio_unitario" [name]="'precio' + $index" min="0" step="0.01" required>
+          <!-- No se deja quitar la última línea: siempre queda al menos una. -->
           <button type="button" class="linea-quitar" (click)="quitarLinea($index)" aria-label="Quitar línea" [disabled]="lineas().length === 1">×</button>
         </div>
       }
@@ -135,6 +150,7 @@
       <button type="button" class="linea-agregar" (click)="agregarLinea()">+ Agregar línea</button>
     </div>
 
+    <!-- Total calculado a partir de las líneas (computed totalCompra). -->
     <div class="compra-total">
       <span>Total</span>
       <strong>${{ totalCompra().toFixed(2) }}</strong>

@@ -1,8 +1,15 @@
+/*
+   Área bajo la barra donde se muestra cada página: ancho máximo centrado y espacio interior.
+   min-height: calc(100vh - 64px) = alto de la ventana (100vh) menos la barra superior.
+ */
 .contenido {
+  max-width: 1400px;
+  margin: 0 auto;
   padding: 1.5rem;
   min-height: calc(100vh - 64px);
 }
 
+/* En celular se reduce el espacio interior para aprovechar la pantalla. */
 @media (max-width: 700px) {
   .contenido {
     padding: 1rem;

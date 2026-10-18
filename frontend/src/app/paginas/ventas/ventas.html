@@ -1,119 +1,170 @@
-<div class="ventas-layout">
-  @if (cargando()) {
-    <p class="estado-mensaje">Cargando ventas…</p>
-  } @else if (error()) {
-    <p class="estado-mensaje estado-error">No se pudo cargar la información: {{ error() }}</p>
-  } @else {
-    <div class="ventas-header">
-      <h3>Ventas</h3>
-      <button type="button" class="btn-agregar" (click)="abrirNuevaVenta()">+ Agregar venta</button>
-    </div>
-
-    <div class="ventas-lista">
-      <div class="venta-fila venta-encabezado">
-        <span>Fecha</span>
-        <span>Cajero</span>
-        <span>Total</span>
-        <span>Pago</span>
-        <span>Estado</span>
-        <span></span>
+<!-- Tres estados posibles: cargando, error o la pantalla de cobro. -->
+@if (cargando()) {
+  <p class="estado-mensaje">Cargando menú…</p>
+} @else if (error()) {
+  <p class="estado-mensaje estado-error">No se pudo cargar la información: {{ error() }}</p>
+} @else {
+  <!-- Dos columnas: el menú a la izquierda y el pedido a la derecha (en celular, el pedido es un panel). -->
+  <div class="pos-layout">
+    <section class="pos-menu">
+      <div class="pos-barra">
+        <!-- Buscador: [ngModel] + (ngModelChange) es el enlace bidireccional escrito a mano,
+             necesario porque `busqueda` es un signal (se lee con () y se cambia con .set).
+             (keydown.enter) permite que un lector de códigos de barras agregue el producto. -->
+        <input
+          type="search"
+          class="pos-buscador"
+          placeholder="Buscar producto o escanear código"
+          aria-label="Buscar producto o escanear código de barras"
+          [ngModel]="busqueda()"
+          (ngModelChange)="busqueda.set($event)"
+          (keydown.enter)="agregarPorCodigo()">
+        <a routerLink="/historial-ventas" class="pos-historial">Historial de ventas</a>
       </div>
 
-      @for (venta of ventas(); track venta.id) {
-        <div class="venta-fila">
-          <span>{{ venta.fecha | slice: 0:10 }}</span>
-          <span>{{ venta.empleado?.nombre ?? '—' }}</span>
-          <span>${{ venta.total.toFixed(2) }}</span>
-          <span>{{ venta.metodo_pago ?? '—' }}</span>
-          <span class="venta-estado" [class]="'estado-' + venta.estado">{{ venta.estado }}</span>
-          <span class="venta-acciones">
-            <button type="button" class="venta-accion" (click)="abrirEditarVenta(venta)" aria-label="Editar venta">✎</button>
-            <button type="button" class="venta-accion" (click)="eliminarVenta(venta)" aria-label="Eliminar venta">🗑</button>
-          </span>
-        </div>
-      } @empty {
-        <p class="estado-mensaje">No hay ventas registradas.</p>
-      }
-    </div>
-  }
-</div>
-
-<app-modal
-  [abierto]="modalVentaAbierto()"
-  [titulo]="ventaEditando() ? 'Editar venta' : 'Nueva venta'"
-  (cerrar)="cerrarModal()">
-  <form class="form-modal form-venta" (ngSubmit)="guardarVenta()">
-    <label>
-      Cajero / encargado
-      <select name="id_empleado" [(ngModel)]="formVenta.id_empleado" required>
-        @for (empleado of empleados(); track empleado.id) {
-          <option [ngValue]="empleado.id">{{ empleado.nombre }}</option>
+      <!-- Pestañas de categoría. [class.activa] marca la que está seleccionada. -->
+      <div class="pos-categorias" role="tablist" aria-label="Categorías">
+        <button
+          type="button"
+          class="pos-categoria"
+          [class.activa]="categoriaSeleccionada() === null"
+          (click)="seleccionarCategoria(null)">
+          Todo
+        </button>
+        @for (categoria of categorias(); track categoria.id) {
+          <button
+            type="button"
+            class="pos-categoria"
+            [class.activa]="categoriaSeleccionada() === categoria.id"
+            (click)="seleccionarCategoria(categoria.id)">
+            {{ categoria.nombre }}
+          </button>
         }
-      </select>
-    </label>
-
-    <label>
-      Método de pago
-      <select name="metodo_pago" [(ngModel)]="formVenta.metodo_pago" required>
-        <option value="efectivo">Efectivo</option>
-        <option value="tarjeta">Tarjeta</option>
-      </select>
-    </label>
-
-    <label>
-      Estado
-      <select name="estado" [(ngModel)]="formVenta.estado" required>
-        <option value="confirmada">Confirmada</option>
-        <option value="cancelada">Cancelada</option>
-        <option value="devuelta">Devuelta</option>
-      </select>
-    </label>
-
-    <div class="lineas-compra">
-      <div class="linea-fila linea-encabezado">
-        <span>Producto</span>
-        <span>Cantidad</span>
-        <span>Precio unit.</span>
-        <span></span>
       </div>
 
-      @for (linea of lineas(); track $index) {
-        <div class="linea-fila">
-          <select [(ngModel)]="linea.id_producto" [name]="'producto' + $index" (ngModelChange)="autocompletarPrecio($index)" required>
-            <option [ngValue]="null" disabled>Selecciona…</option>
-            @for (producto of productos(); track producto.id) {
-              <option [ngValue]="producto.id">{{ producto.nombre }}</option>
+      <!-- Menú: un botón grande por producto (ya filtrado por categoría y buscador). -->
+      <div class="pos-productos">
+        @for (producto of productosFiltrados(); track producto.id) {
+          <!-- Se desactiva cuando ya no queda stock que agregar. -->
+          <button
+            type="button"
+            class="pos-producto"
+            [disabled]="sinStock(producto)"
+            (click)="agregar(producto)">
+            <span class="pos-producto-nombre">{{ producto.nombre }}</span>
+            <span class="pos-producto-precio">${{ producto.precio.toFixed(2) }}</span>
+            <!-- Aviso según el stock: "Agotado" si no hay, "Quedan N" si hay 5 o menos. -->
+            @if (producto.cantidad === 0) {
+              <span class="pos-producto-aviso">Agotado</span>
+            } @else if (producto.cantidad <= 5) {
+              <span class="pos-producto-aviso pos-aviso-poco">Quedan {{ producto.cantidad }}</span>
+            }
+          </button>
+        } @empty {
+          <p class="estado-mensaje">No hay productos que coincidan.</p>
+        }
+      </div>
+    </section>
+
+    <!-- Panel del pedido. La clase `abierto` solo importa en pantallas chicas, donde el panel
+         se desliza desde abajo. -->
+    <aside class="pos-pedido" [class.abierto]="pedidoAbierto()">
+      <div class="pos-pedido-cabecera">
+        <h3>Pedido actual</h3>
+        <!-- Este botón solo se ve en celular (para ocultar el panel). -->
+        <button type="button" class="pos-cerrar-pedido" (click)="pedidoAbierto.set(false)" aria-label="Ocultar pedido">×</button>
+      </div>
+
+      <!-- Líneas del pedido con sus controles − / + / quitar. -->
+      <div class="pos-items">
+        @for (item of pedido(); track item.producto.id) {
+          <div class="pos-item">
+            <div class="pos-item-info">
+              <span class="pos-item-nombre">{{ item.producto.nombre }}</span>
+              <span class="pos-item-precio">${{ item.producto.precio.toFixed(2) }} c/u</span>
+            </div>
+            <div class="pos-cantidad">
+              <button type="button" (click)="restar(item)" aria-label="Quitar una unidad">−</button>
+              <span>{{ item.cantidad }}</span>
+              <!-- El + se desactiva al llegar al stock disponible. -->
+              <button type="button" (click)="agregar(item.producto)" [disabled]="sinStock(item.producto)" aria-label="Agregar una unidad">+</button>
+            </div>
+            <span class="pos-item-total">${{ (item.cantidad * item.producto.precio).toFixed(2) }}</span>
+            <button type="button" class="pos-item-quitar" (click)="quitar(item)" aria-label="Quitar del pedido">×</button>
+          </div>
+        } @empty {
+          <!-- Pedido vacío: si acaba de cobrarse una venta, se confirma; si no, se da una instrucción. -->
+          @if (ultimaVenta() !== null) {
+            <!-- El `!` le dice a TypeScript "aquí ya sé que no es null" (lo comprobó el @if). -->
+            <p class="pos-exito">Venta registrada por ${{ ultimaVenta()!.toFixed(2) }}. ¡Gracias!</p>
+          } @else {
+            <p class="estado-mensaje">Toca un producto para agregarlo al pedido.</p>
+          }
+        }
+      </div>
+
+      <!-- Zona de cobro: cajero, método de pago, efectivo recibido, total y botones. -->
+      <div class="pos-cobro">
+        <label class="pos-campo">
+          Cajero
+          <select [ngModel]="idCajero()" (ngModelChange)="idCajero.set($event)">
+            @for (empleado of empleados(); track empleado.id) {
+              <!-- [ngValue] guarda el número real (id) y no un texto, como haría `value`. -->
+              <option [ngValue]="empleado.id">{{ empleado.nombre }}</option>
             }
           </select>
-          <input type="number" [(ngModel)]="linea.cantidad" [name]="'cantidad' + $index" min="1" step="1" required>
-          <input type="number" [(ngModel)]="linea.precio_unitario" [name]="'precio' + $index" min="0" step="0.01" required>
-          <button type="button" class="linea-quitar" (click)="quitarLinea($index)" aria-label="Quitar línea" [disabled]="lineas().length === 1">×</button>
+        </label>
+
+        <!-- Dos botones tipo "interruptor": el activo se resalta con la clase `activo`. -->
+        <div class="pos-metodos" role="group" aria-label="Método de pago">
+          <button type="button" [class.activo]="metodoPago() === 'efectivo'" (click)="cambiarMetodo('efectivo')">Efectivo</button>
+          <button type="button" [class.activo]="metodoPago() === 'tarjeta'" (click)="cambiarMetodo('tarjeta')">Tarjeta</button>
         </div>
-      }
 
-      <button type="button" class="linea-agregar" (click)="agregarLinea()">+ Agregar línea</button>
-    </div>
+        <!-- Solo en efectivo y con algo en el pedido: se pide cuánto entregó el cliente. -->
+        @if (metodoPago() === 'efectivo' && pedido().length > 0) {
+          <label class="pos-campo">
+            Recibido
+            <!-- inputmode="decimal" abre el teclado numérico en celular/tablet. -->
+            <input
+              type="number"
+              min="0"
+              step="0.01"
+              inputmode="decimal"
+              [ngModel]="recibido()"
+              (ngModelChange)="recibido.set($event)">
+          </label>
+          <!-- El cambio solo se muestra cuando lo recibido ya cubre el total. -->
+          @if (!faltaPagar()) {
+            <p class="pos-cambio">Cambio <strong>${{ cambio().toFixed(2) }}</strong></p>
+          }
+        }
 
-    <label>
-      Descuento
-      <input type="number" name="descuento" [(ngModel)]="formVenta.descuento" min="0" step="0.01">
-    </label>
+        <div class="pos-total">
+          <span>Total</span>
+          <strong>${{ total().toFixed(2) }}</strong>
+        </div>
 
-    <div class="venta-resumen">
-      <span>Subtotal <strong>${{ subtotalVenta().toFixed(2) }}</strong></span>
-      <span>Descuento <strong>${{ (formVenta.descuento || 0).toFixed(2) }}</strong></span>
-      <span class="venta-total-final">Total <strong>${{ totalVenta().toFixed(2) }}</strong></span>
-    </div>
+        <!-- Error devuelto por el backend al cobrar (por ejemplo, stock insuficiente). -->
+        @if (errorCobro()) {
+          <p class="form-error">{{ errorCobro() }}</p>
+        }
 
-    @if (formError()) {
-      <p class="form-error">{{ formError() }}</p>
-    }
+        <!-- El botón de cobrar se desactiva si el pedido está vacío, falta dinero o ya se está cobrando. -->
+        <button
+          type="button"
+          class="pos-cobrar"
+          [disabled]="pedido().length === 0 || faltaPagar() || cobrando()"
+          (click)="cobrar()">
+          {{ cobrando() ? 'Cobrando…' : 'Cobrar $' + total().toFixed(2) }}
+        </button>
+        <button type="button" class="pos-vaciar" [disabled]="pedido().length === 0" (click)="vaciar()">Cancelar pedido</button>
+      </div>
+    </aside>
 
-    <div class="form-acciones">
-      <button type="button" class="form-btn-cancelar" (click)="cerrarModal()">Cancelar</button>
-      <button type="submit" class="form-btn-guardar" [disabled]="guardando()">
-        {{ guardando() ? 'Guardando…' : 'Guardar' }}
-      </button>
-    </div>
-  </form>
-</app-modal>
+    <!-- Barra fija inferior que SOLO aparece en celular/tablet: resume el pedido y lo abre. -->
+    <button type="button" class="pos-barra-pedido" (click)="pedidoAbierto.set(true)">
+      Ver pedido ({{ cantidadEnPedido() }}) · ${{ total().toFixed(2) }}
+    </button>
+  </div>
+}

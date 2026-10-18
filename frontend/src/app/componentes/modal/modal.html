@@ -1,11 +1,16 @@
+<!-- Todo el modal existe solo mientras `abierto` sea verdadero. -->
 @if (abierto()) {
+  <!-- Fondo oscuro que cubre la pantalla: hacer clic en él cierra el modal. -->
   <div class="modal-overlay" (click)="cerrar.emit()">
+    <!-- stopPropagation evita que un clic DENTRO del panel "suba" al fondo y lo cierre. -->
     <div class="modal-panel" (click)="$event.stopPropagation()">
       <header class="modal-header">
         <h3>{{ titulo() }}</h3>
         <button type="button" class="modal-cerrar" (click)="cerrar.emit()" aria-label="Cerrar">×</button>
       </header>
       <div class="modal-contenido">
+        <!-- ng-content = "proyección de contenido": aquí se inserta lo que la página escribió
+             entre <app-modal> y </app-modal> (normalmente un formulario). -->
         <ng-content></ng-content>
       </div>
     </div>

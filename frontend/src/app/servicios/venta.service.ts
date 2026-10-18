@@ -10,6 +10,7 @@ import { mensajeErrorApi } from '../utilidades/api-errores';
    Antes este servicio hacía todos los pasos (encabezado, líneas, descuento de stock,
    ingreso en finanzas) uno por uno contra Supabase. Ahora manda la venta completa al
    backend y allí corre en una sola transacción (ver backend/routes/ventas.js).
+   Mismo patrón que CategoriaService (ver ahí la explicación completa).
  */
 @Injectable({
   providedIn: 'root',
@@ -18,6 +19,7 @@ export class VentaService {
   private http = inject(HttpClient);
   private api = `${environment.apiUrl}/ventas`;
 
+  // GET /api/ventas -> lista las ventas, cada una con su empleado (cajero).
   async listar(): Promise<{ data: Venta[]; error: string | null }> {
     try {
       const data = await firstValueFrom(this.http.get<Venta[]>(this.api));
@@ -27,6 +29,7 @@ export class VentaService {
     }
   }
 
+  // GET /api/ventas/:id/detalles -> las líneas de una venta (para editarla en el historial).
   async listarDetalles(idVenta: number): Promise<{ data: DetalleVenta[]; error: string | null }> {
     try {
       const data = await firstValueFrom(this.http.get<DetalleVenta[]>(`${this.api}/${idVenta}/detalles`));
@@ -36,6 +39,8 @@ export class VentaService {
     }
   }
 
+  // POST /api/ventas -> crea la venta y sus líneas en un solo envío ({ venta, lineas }).
+  // La usa la pantalla del cajero al cobrar.
   async crear(venta: VentaInput, lineas: LineaVentaForm[]): Promise<{ error: string | null }> {
     try {
       await firstValueFrom(this.http.post(this.api, { venta, lineas }));
@@ -47,6 +52,8 @@ export class VentaService {
 
   // `_estadoAnterior` ya no se envía: el backend lee el estado real desde la base de datos
   // (más seguro). Se conserva el parámetro para no tener que cambiar la página de ventas.
+  // (El guion bajo inicial es la convención de "parámetro que no se usa".)
+  // PUT /api/ventas/:id -> reemplaza el encabezado y todas las líneas.
   async actualizar(
     id: number,
     venta: VentaInput,
@@ -61,6 +68,7 @@ export class VentaService {
     }
   }
 
+  // DELETE /api/ventas/:id -> elimina la venta y sus líneas.
   async eliminar(id: number): Promise<{ error: string | null }> {
     try {
       await firstValueFrom(this.http.delete(`${this.api}/${id}`));

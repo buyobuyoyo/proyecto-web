@@ -1,10 +1,13 @@
 <article class="producto-card">
+  <!-- Los botones de editar/eliminar solo aparecen si el padre lo pidió. -->
   @if (mostrarAcciones()) {
     <div class="producto-acciones">
+      <!-- (click)="editar.emit()": avisa a la página para que ella actúe. -->
       <button type="button" class="producto-accion-btn" (click)="editar.emit()" aria-label="Editar producto">✎</button>
       <button type="button" class="producto-accion-btn producto-accion-eliminar" (click)="eliminar.emit()" aria-label="Eliminar producto">🗑</button>
     </div>
   }
+  <!-- loading="lazy": el navegador descarga la imagen solo cuando está por verse. -->
   <img [src]="imagen()" [alt]="nombre()" class="producto-imagen" loading="lazy">
   <p class="producto-nombre">{{ nombre() }}</p>
   <span class="producto-etiqueta">{{ etiqueta() }}</span>

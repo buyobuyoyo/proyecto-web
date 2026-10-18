@@ -1,12 +1,17 @@
 <div class="empleado-card">
+  <!-- @if: este bloque solo existe en la página cuando mostrarAcciones() es verdadero. -->
   @if (mostrarAcciones()) {
     <div class="empleado-acciones">
+      <!-- (click)="editar.emit()": al hacer clic se avisa al componente padre. -->
       <button type="button" class="empleado-accion-btn" (click)="editar.emit()" aria-label="Editar empleado">✎</button>
       <button type="button" class="empleado-accion-btn empleado-accion-eliminar" (click)="eliminar.emit()" aria-label="Eliminar empleado">🗑</button>
     </div>
   }
+  <!-- [src] y [alt] entre corchetes = "enlazar a una expresión" (no es texto fijo). -->
   <img [src]="foto()" [alt]="nombre()" class="empleado-foto">
+  <!-- [class.baja]="condición": agrega la clase CSS `baja` solo cuando la condición se cumple. -->
   <span class="empleado-estado" [class.baja]="estado() === 'baja'">{{ estado() }}</span>
+  <!-- {{ ... }} = interpolación: inserta el valor de la expresión como texto. -->
   <p><strong>Nombre:</strong> {{ nombre() }}</p>
   <p><strong>Cargo:</strong> {{ cargo() }}</p>
   <p><strong>Rendimiento:</strong> {{ rendimiento() }}%</p>

@@ -1,22 +1,29 @@
 import { Component, computed, inject, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
-import { SlicePipe } from '@angular/common';
-import { Modal } from '../../componentes/modal/modal';
+import { RouterLink } from '@angular/router';
 import { VentaService } from '../../servicios/venta.service';
 import { EmpleadoService } from '../../servicios/empleado.service';
 import { ProductoService } from '../../servicios/producto.service';
+import { CategoriaService } from '../../servicios/categoria.service';
 import { Empleado } from '../../modelos/empleado.model';
-import { Venta, VentaInput, EstadoVenta } from '../../modelos/venta.model';
-import { LineaVentaForm } from '../../modelos/detalle-venta.model';
+import { Categoria } from '../../modelos/categoria.model';
 import { Producto } from '../../modelos/producto.model';
+import { MetodoPago } from '../../modelos/venta.model';
 
-function lineaVacia(): LineaVentaForm {
-  return { id_producto: null, cantidad: 1, precio_unitario: 0 };
+// Una línea del pedido que se está armando: el producto y cuántas unidades lleva.
+interface ItemPedido {
+  producto: Producto;
+  cantidad: number;
 }
 
+// Pantalla del cajero (punto de venta). El flujo es:
+//   1. Se elige un producto del menú -> se agrega al pedido (panel derecho).
+//   2. Se ajustan cantidades, se elige método de pago (y, en efectivo, cuánto se recibió).
+//   3. "Cobrar" envía la venta al backend, que la guarda y descuenta el stock.
+// El historial y la edición de ventas están en otra página (historial-ventas).
 @Component({
   selector: 'app-ventas',
-  imports: [Modal, FormsModule, SlicePipe],
+  imports: [FormsModule, RouterLink],
   templateUrl: './ventas.html',
   styleUrl: './ventas.css',
 })
@@ -24,174 +31,222 @@ export class Ventas {
   private ventaService = inject(VentaService);
   private empleadoService = inject(EmpleadoService);
   private productoService = inject(ProductoService);
+  private categoriaService = inject(CategoriaService);
 
-  ventas = signal<Venta[]>([]);
-  empleados = signal<Empleado[]>([]);
+  // --- Datos que vienen del backend ---
+  categorias = signal<Categoria[]>([]);
   productos = signal<Producto[]>([]);
+  empleados = signal<Empleado[]>([]);
   cargando = signal(true);
   error = signal<string | null>(null);
 
-  modalVentaAbierto = signal(false);
-  ventaEditando = signal<Venta | null>(null);
-  estadoOriginalVenta: EstadoVenta = 'confirmada';
-  formVenta: VentaInput = this.ventaVacia();
-  lineas = signal<LineaVentaForm[]>([lineaVacia()]);
-  formError = signal<string | null>(null);
-  guardando = signal(false);
+  // --- Filtros del menú ---
+  // id de la categoría activa; null = "Todo".
+  categoriaSeleccionada = signal<number | null>(null);
+  // Texto escrito en el buscador (nombre o código de barras).
+  busqueda = signal('');
 
-  subtotalVenta = computed(() =>
-    this.lineas().reduce((acc, l) => acc + l.cantidad * l.precio_unitario, 0),
+  // --- El pedido en curso ---
+  pedido = signal<ItemPedido[]>([]);
+  // Cajero que registra la venta (de momento se elige a mano; cuando exista login saldrá de la sesión).
+  idCajero = signal<number | null>(null);
+  metodoPago = signal<MetodoPago>('efectivo');
+  // Dinero entregado por el cliente (solo se usa en efectivo, para calcular el cambio).
+  recibido = signal<number | null>(null);
+  // En pantallas chicas el pedido es un panel que se abre/cierra; esto controla si está abierto.
+  pedidoAbierto = signal(false);
+
+  // --- Estado del cobro ---
+  cobrando = signal(false);
+  errorCobro = signal<string | null>(null);
+  // Total de la última venta registrada; se muestra como mensaje de confirmación.
+  ultimaVenta = signal<number | null>(null);
+
+  // Productos que se muestran en el menú: pasan el filtro de categoría Y el del buscador.
+  // Al ser `computed`, se recalcula solo cuando cambia cualquiera de los signals que usa.
+  productosFiltrados = computed(() => {
+    const idCategoria = this.categoriaSeleccionada();
+    const texto = this.busqueda().trim().toLowerCase();
+    return this.productos().filter(
+      (p) =>
+        (idCategoria === null || p.id_categoria === idCategoria) &&
+        (texto === '' ||
+          p.nombre.toLowerCase().includes(texto) ||
+          // `?? ''` evita fallar con productos sin código de barras (null).
+          (p.codigo_barras ?? '').toLowerCase().includes(texto)),
+    );
+  });
+
+  // Total de unidades en el pedido (para el texto "Ver pedido (3)").
+  cantidadEnPedido = computed(() => this.pedido().reduce((acc, i) => acc + i.cantidad, 0));
+  // Total a cobrar = suma de (cantidad × precio) de cada línea.
+  total = computed(() => this.pedido().reduce((acc, i) => acc + i.cantidad * i.producto.precio, 0));
+  // Cambio a devolver; Math.max(0, ...) evita mostrar un cambio negativo.
+  cambio = computed(() => Math.max(0, (this.recibido() ?? 0) - this.total()));
+  // true si el pago es en efectivo y lo recibido no alcanza para cubrir el total.
+  faltaPagar = computed(
+    () => this.metodoPago() === 'efectivo' && (this.recibido() ?? 0) < this.total(),
   );
-  totalVenta = computed(() => Math.max(0, this.subtotalVenta() - (this.formVenta.descuento || 0)));
 
   constructor() {
     this.cargarDatos();
   }
 
-  private ventaVacia(): VentaInput {
-    return {
-      fecha: new Date().toISOString(),
-      id_empleado: 0,
-      subtotal: 0,
-      descuento: 0,
-      total: 0,
-      metodo_pago: 'efectivo',
-      estado: 'confirmada',
-    };
-  }
-
+  // Pide categorías, productos y empleados al backend. Se llama al abrir la página.
   async cargarDatos() {
     this.cargando.set(true);
     this.error.set(null);
 
-    const [ventasRes, empleadosRes, productosRes] = await Promise.all([
-      this.ventaService.listar(),
-      this.empleadoService.listar(),
+    // Promise.all lanza las tres peticiones a la vez y espera a que terminen todas.
+    const [categoriasRes, productosRes, empleadosRes] = await Promise.all([
+      this.categoriaService.listar(),
       this.productoService.listar(),
+      this.empleadoService.listar(),
     ]);
 
-    const error = ventasRes.error ?? empleadosRes.error ?? productosRes.error;
+    // Se toma el primer error que exista (`??` pasa al siguiente si el anterior es null).
+    const error = categoriasRes.error ?? productosRes.error ?? empleadosRes.error;
     if (error) {
       this.error.set(error);
       this.cargando.set(false);
       return;
     }
 
-    this.ventas.set(ventasRes.data);
-    this.empleados.set(empleadosRes.data);
+    this.categorias.set(categoriasRes.data);
     this.productos.set(productosRes.data);
+    // Solo los empleados activos pueden figurar como cajero.
+    const activos = empleadosRes.data.filter((e) => e.estado === 'activo');
+    this.empleados.set(activos);
+    // Si todavía no hay cajero elegido, se preselecciona el primero.
+    if (this.idCajero() === null && activos.length > 0) {
+      this.idCajero.set(activos[0].id);
+    }
     this.cargando.set(false);
   }
 
-  abrirNuevaVenta() {
-    if (this.empleados().length === 0) {
-      alert('Primero registra al menos un empleado en RH.');
-      return;
-    }
-    this.ventaEditando.set(null);
-    this.estadoOriginalVenta = 'confirmada';
-    this.formVenta = { ...this.ventaVacia(), id_empleado: this.empleados()[0].id };
-    this.lineas.set([lineaVacia()]);
-    this.formError.set(null);
-    this.modalVentaAbierto.set(true);
+  seleccionarCategoria(id: number | null) {
+    this.categoriaSeleccionada.set(id);
   }
 
-  async abrirEditarVenta(venta: Venta) {
-    this.ventaEditando.set(venta);
-    this.estadoOriginalVenta = venta.estado;
-    this.formVenta = {
-      fecha: venta.fecha,
-      id_empleado: venta.id_empleado,
-      subtotal: venta.subtotal,
-      descuento: venta.descuento,
-      total: venta.total,
-      metodo_pago: venta.metodo_pago,
-      estado: venta.estado,
-    };
-    this.formError.set(null);
+  // Un lector de códigos de barras "teclea" el código y manda Enter: si coincide exacto, se agrega.
+  agregarPorCodigo() {
+    const codigo = this.busqueda().trim();
+    if (codigo === '') {
+      return;
+    }
+    const producto = this.productos().find((p) => p.codigo_barras === codigo);
+    if (producto) {
+      this.agregar(producto);
+      // Se limpia el buscador para poder escanear el siguiente producto.
+      this.busqueda.set('');
+    }
+  }
 
-    const { data, error } = await this.ventaService.listarDetalles(venta.id);
+  // Cuántas unidades de ese producto hay ya en el pedido (0 si no está).
+  private enPedido(producto: Producto): number {
+    return this.pedido().find((i) => i.producto.id === producto.id)?.cantidad ?? 0;
+  }
+
+  // true si ya no se puede agregar más de este producto (el pedido ya llegó al stock disponible).
+  sinStock(producto: Producto): boolean {
+    return this.enPedido(producto) >= producto.cantidad;
+  }
+
+  // Agrega una unidad del producto al pedido (o suma 1 si ya estaba).
+  agregar(producto: Producto) {
+    if (this.sinStock(producto)) {
+      return;
+    }
+    // Al empezar un pedido nuevo se oculta el mensaje de la venta anterior.
+    this.ultimaVenta.set(null);
+    // `update` cambia el signal a partir de su valor anterior. Siempre se crea un arreglo NUEVO
+    // (map / spread) en vez de modificar el existente, para que Angular detecte el cambio.
+    this.pedido.update((items) =>
+      items.some((i) => i.producto.id === producto.id)
+        ? items.map((i) => (i.producto.id === producto.id ? { ...i, cantidad: i.cantidad + 1 } : i))
+        : [...items, { producto, cantidad: 1 }],
+    );
+  }
+
+  // Resta una unidad; si llega a 0, la línea desaparece del pedido (el filter la descarta).
+  restar(item: ItemPedido) {
+    this.pedido.update((items) =>
+      items
+        .map((i) => (i.producto.id === item.producto.id ? { ...i, cantidad: i.cantidad - 1 } : i))
+        .filter((i) => i.cantidad > 0),
+    );
+  }
+
+  // Quita la línea completa, sin importar cuántas unidades llevara.
+  quitar(item: ItemPedido) {
+    this.pedido.update((items) => items.filter((i) => i.producto.id !== item.producto.id));
+  }
+
+  // Limpia el pedido y todo lo relacionado con el cobro (se usa al cancelar y tras cobrar).
+  vaciar() {
+    this.pedido.set([]);
+    this.recibido.set(null);
+    this.errorCobro.set(null);
+    this.pedidoAbierto.set(false);
+  }
+
+  // Al cambiar de método de pago se borra el monto recibido para no arrastrar un valor viejo.
+  cambiarMetodo(metodo: MetodoPago) {
+    this.metodoPago.set(metodo);
+    this.recibido.set(null);
+  }
+
+  // Registra la venta en el backend.
+  async cobrar() {
+    const idCajero = this.idCajero();
+    // Protección extra: el botón ya está desactivado en estos casos, pero se revisa también aquí.
+    if (this.pedido().length === 0 || this.faltaPagar()) {
+      return;
+    }
+    if (idCajero === null) {
+      this.errorCobro.set('Registra al menos un empleado activo en RH para poder cobrar.');
+      return;
+    }
+
+    this.cobrando.set(true);
+    this.errorCobro.set(null);
+
+    const total = this.total();
+    // Se envían dos cosas: el encabezado de la venta y sus líneas. El backend las guarda en una
+    // sola transacción y descuenta el stock (ver backend/routes/ventas.js).
+    const { error } = await this.ventaService.crear(
+      {
+        fecha: new Date().toISOString(),
+        id_empleado: idCajero,
+        subtotal: total,
+        descuento: 0, // el descuento manual solo existe en el historial (administrador)
+        total,
+        metodo_pago: this.metodoPago(),
+        estado: 'confirmada',
+      },
+      // Cada línea lleva el precio de ese momento (así el historial conserva lo que se cobró).
+      this.pedido().map((i) => ({
+        id_producto: i.producto.id,
+        cantidad: i.cantidad,
+        precio_unitario: i.producto.precio,
+      })),
+    );
+
+    this.cobrando.set(false);
+
+    // Si falló (por ejemplo, otro cajero vendió el último producto), el pedido se conserva
+    // para poder corregirlo y reintentar.
     if (error) {
-      this.formError.set(error);
-      this.lineas.set([lineaVacia()]);
-    } else {
-      this.lineas.set(
-        data.length > 0
-          ? data.map((d) => ({
-              id_producto: d.id_producto,
-              cantidad: d.cantidad,
-              precio_unitario: d.precio_unitario,
-            }))
-          : [lineaVacia()],
-      );
-    }
-
-    this.modalVentaAbierto.set(true);
-  }
-
-  cerrarModal() {
-    this.modalVentaAbierto.set(false);
-  }
-
-  agregarLinea() {
-    this.lineas.update((ls) => [...ls, lineaVacia()]);
-  }
-
-  quitarLinea(index: number) {
-    this.lineas.update((ls) => ls.filter((_, i) => i !== index));
-  }
-
-  autocompletarPrecio(index: number) {
-    const linea = this.lineas()[index];
-    const producto = this.productos().find((p) => p.id === linea.id_producto);
-    if (producto && linea.precio_unitario === 0) {
-      this.lineas.update((ls) =>
-        ls.map((l, i) => (i === index ? { ...l, precio_unitario: producto.precio } : l)),
-      );
-    }
-  }
-
-  async guardarVenta() {
-    const lineasValidas = this.lineas().filter((l) => l.id_producto !== null && l.cantidad > 0);
-    if (lineasValidas.length === 0) {
-      this.formError.set('Agrega al menos una línea con producto y cantidad válidos.');
+      this.errorCobro.set(error);
       return;
     }
 
-    this.guardando.set(true);
-    this.formError.set(null);
-
-    const datos: VentaInput = {
-      ...this.formVenta,
-      subtotal: this.subtotalVenta(),
-      total: this.totalVenta(),
-    };
-
-    const editando = this.ventaEditando();
-    const { error } = editando
-      ? await this.ventaService.actualizar(editando.id, datos, lineasValidas, this.estadoOriginalVenta)
-      : await this.ventaService.crear(datos, lineasValidas);
-
-    this.guardando.set(false);
-
-    if (error) {
-      this.formError.set(error);
-      return;
+    this.ultimaVenta.set(total);
+    this.vaciar();
+    // Recarga el stock que acaba de descontar la venta.
+    const { data } = await this.productoService.listar();
+    if (data.length > 0) {
+      this.productos.set(data);
     }
-
-    this.modalVentaAbierto.set(false);
-    await this.cargarDatos();
-  }
-
-  async eliminarVenta(venta: Venta) {
-    if (!confirm(`¿Eliminar la venta #${venta.id}? Esto no revierte el stock si ya fue confirmada.`)) {
-      return;
-    }
-    const { error } = await this.ventaService.eliminar(venta.id);
-    if (error) {
-      alert(error);
-      return;
-    }
-    await this.cargarDatos();
   }
 }

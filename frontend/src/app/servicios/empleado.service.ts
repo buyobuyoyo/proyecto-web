@@ -8,6 +8,7 @@ import { mensajeErrorApi } from '../utilidades/api-errores';
 /*
    RH es solo de consulta (alcance acordado): este servicio únicamente lista empleados.
    No hay crear / actualizar / eliminar, y el backend tampoco tiene esas rutas.
+   Mismo patrón que CategoriaService (ver ahí la explicación completa).
  */
 @Injectable({
   providedIn: 'root',
@@ -16,6 +17,7 @@ export class EmpleadoService {
   private http = inject(HttpClient);
   private api = `${environment.apiUrl}/empleados`;
 
+  // GET /api/empleados -> lista todos los empleados.
   async listar(): Promise<{ data: Empleado[]; error: string | null }> {
     try {
       const data = await firstValueFrom(this.http.get<Empleado[]>(this.api));

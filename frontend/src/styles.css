@@ -1,42 +1,78 @@
 /* You can add global styles to this file, and also import other style files */
 
+/*
+   Variables CSS globales ("tokens de diseño"). Se declaran en :root (el elemento <html>) para
+   poder usarlas en cualquier archivo con var(--nombre). Si se cambia un valor aquí, cambia en
+   toda la aplicación: por ejemplo --verde-principal es el color de marca.
+ */
 :root {
   --verde-principal: #2fae6a;
   --verde-oscuro: #23935a;
+  --verde-suave: #e6f5ec;
   --negro-badge: #1a1a1a;
-  --gris-claro: #e6e6e6;
-  --gris-medio: #cfcfcf;
-  --gris-oscuro: #555;
+  --gris-claro: #eef1ed;
+  --gris-medio: #d5dad3;
+  --gris-oscuro: #5b6459;
   --rojo-cancelar: #e5484d;
-  --texto-principal: #222;
+  --texto-principal: #1f2a22;
+  --texto-suave: #6b756d;
+  --fondo: #f4f6f3;
+  --borde: #e3e7e2;
+  --radio: 14px;
+  --radio-chico: 10px;
+  --sombra: 0 1px 2px rgba(20, 35, 25, 0.04), 0 6px 18px rgba(20, 35, 25, 0.06);
+  --sombra-hover: 0 2px 4px rgba(20, 35, 25, 0.06), 0 10px 24px rgba(20, 35, 25, 0.1);
 }
 
+/*
+   Regla base. `*` = todos los elementos. box-sizing: border-box hace que el width/height
+   INCLUYA el padding y el borde; así el tamaño que se escribe es el tamaño real que se ve.
+ */
 * {
   box-sizing: border-box;
 }
 
+/* La página ocupa toda la altura de la ventana y sin el margen que el navegador pone por defecto. */
 html,
 body {
   height: 100%;
   margin: 0;
 }
 
+/* Tipografía, color de texto y fondo base de toda la aplicación. overflow-x: hidden evita el scroll horizontal. */
 body {
-  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
   color: var(--texto-principal);
-  background: #f5f5f5;
+  background: var(--fondo);
   overflow-x: hidden;
 }
 
+/* Ninguna imagen se sale de su contenedor: max-width: 100% la encoge si hace falta. */
 img {
   max-width: 100%;
 }
 
+/* Títulos de sección (h3) con tamaño y espaciado de letras uniformes. */
+h3 {
+  font-size: 1.25rem;
+  letter-spacing: -0.01em;
+}
+
+/*
+   Botones: cursor de mano, misma tipografía que el resto (por defecto no la heredan) y una transición
+   suave cuando cambian de color o sombra.
+ */
 button {
   cursor: pointer;
   font-family: inherit;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease;
 }
 
+/*
+   Contorno visible al navegar con el teclado (Tab). :focus-visible no aparece al hacer clic con el
+   ratón, solo con teclado: es importante para la accesibilidad.
+ */
 button:focus-visible,
 input:focus-visible,
 a:focus-visible {
@@ -47,13 +83,12 @@ a:focus-visible {
 /* Estados de carga/error reutilizados por las páginas conectadas al API */
 
 .estado-mensaje {
-  color: var(--gris-oscuro);
-  font-style: italic;
+  margin: 0.4rem 0;
+  color: var(--texto-suave);
 }
 
 .estado-error {
   color: #b3261e;
-  font-style: normal;
   font-weight: 600;
 }
 
@@ -61,12 +96,18 @@ a:focus-visible {
 
 .btn-agregar {
   align-self: flex-start;
-  padding: 0.6rem 1.2rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.65rem 1.2rem;
   border: none;
-  border-radius: 6px;
+  border-radius: 999px;
   background: var(--verde-principal);
   color: white;
+  font-size: 0.9rem;
   font-weight: 600;
+  text-decoration: none;
+  box-shadow: 0 2px 8px rgba(47, 174, 106, 0.3);
 }
 
 .btn-agregar:hover {
@@ -81,6 +122,7 @@ a:focus-visible {
   gap: 0.9rem;
 }
 
+/* Cada campo es un <label> con el texto arriba y el input debajo (flex en columna). */
 .form-modal label {
   display: flex;
   flex-direction: column;
@@ -89,20 +131,26 @@ a:focus-visible {
   font-size: 0.9rem;
 }
 
+/* Aspecto común de inputs y selects de los formularios. */
 .form-modal input,
 .form-modal select {
-  padding: 0.6rem 0.7rem;
+  padding: 0.7rem 0.8rem;
   border: 1px solid var(--gris-medio);
-  border-radius: 4px;
+  border-radius: var(--radio-chico);
+  background: white;
   font-size: 1rem;
   font-weight: normal;
 }
 
+/* Al enfocar un campo: borde verde y un halo suave (outline) alrededor. */
 .form-modal input:focus-visible,
 .form-modal select:focus-visible {
   border-color: var(--verde-principal);
+  outline: 3px solid var(--verde-suave);
+  outline-offset: 0;
 }
 
+/* Mensaje de error en rojo bajo el formulario. */
 .form-error {
   color: #b3261e;
   font-weight: 600;
@@ -110,28 +158,29 @@ a:focus-visible {
   margin: 0;
 }
 
+/* Fila de botones Cancelar / Guardar, alineada a la derecha. */
 .form-acciones {
   display: flex;
   justify-content: flex-end;
   gap: 0.6rem;
-  margin-top: 0.4rem;
+  margin-top: 0.6rem;
 }
 
+/* Estilo común de ambos botones (forma de píldora: border-radius muy grande). */
 .form-btn-cancelar,
 .form-btn-guardar {
-  padding: 0.6rem 1.2rem;
+  padding: 0.7rem 1.3rem;
   border: none;
-  border-radius: 6px;
+  border-radius: 999px;
   font-weight: 600;
 }
 
 .form-btn-cancelar {
-  background: var(--gris-medio);
+  background: var(--gris-claro);
 }
 
 .form-btn-cancelar:hover {
-  background: var(--gris-oscuro);
-  color: white;
+  background: var(--gris-medio);
 }
 
 .form-btn-guardar {
@@ -143,8 +192,30 @@ a:focus-visible {
   background: var(--verde-oscuro);
 }
 
+/* Botón desactivado (por ejemplo mientras se guarda): gris y sin cursor de mano. */
 .form-btn-guardar:disabled {
   background: var(--gris-medio);
   color: var(--gris-oscuro);
   cursor: not-allowed;
+}
+
+/* Piezas compartidas por las listas de las páginas (historial, compras, finanzas) */
+
+/* Contenedor tipo tarjeta para tablas/listas. overflow: hidden recorta el contenido a las esquinas redondeadas. */
+.lista-tarjeta {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  background: white;
+  box-shadow: var(--sombra);
+  overflow: hidden;
+}
+
+/* Mensaje de "no hay registros" dentro de una lista/tarjeta: separado de los bordes */
+
+.lista-tarjeta > .estado-mensaje {
+  margin: 0;
+  padding: 1.4rem 1.2rem;
+  text-align: center;
 }

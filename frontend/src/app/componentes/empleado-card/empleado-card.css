@@ -1,73 +1,107 @@
-.empleado-card {
-  position: relative;
-  width: 220px;
-  max-width: 100%;
-  border: 1px solid var(--gris-medio);
-  border-radius: 8px;
-  padding: 1rem;
-  background: white;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
-  text-align: center;
+/*
+   :host = el elemento <app-empleado-card> mismo (el "contenedor" que Angular crea alrededor del componente).
+   Por defecto es `inline`; con display: flex la tarjeta de dentro puede estirarse a la altura de su
+   fila (así las tarjetas de RH miden lo mismo que el panel de cifras).
+ */
+:host {
+  display: flex;
 }
 
+/* La tarjeta: position: relative permite colocar los botones de acción encima con position: absolute. */
+.empleado-card {
+  position: relative;
+  width: 230px;
+  max-width: 100%;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  padding: 1.3rem 1.1rem 1.1rem;
+  background: white;
+  box-shadow: var(--sombra);
+  text-align: center;
+  transition: box-shadow 0.2s ease, transform 0.2s ease;
+}
+
+/* Al pasar el cursor, la tarjeta sube un poco (transform) y gana sombra. */
+.empleado-card:hover {
+  box-shadow: var(--sombra-hover);
+  transform: translateY(-2px);
+}
+
+/* Botones de editar/eliminar, fijados a la esquina superior derecha de la tarjeta. */
 .empleado-acciones {
   position: absolute;
-  top: 0.5rem;
-  right: 0.5rem;
+  top: 0.6rem;
+  right: 0.6rem;
   display: flex;
   gap: 0.3rem;
 }
 
+/* Botón redondo de acción. */
 .empleado-accion-btn {
-  width: 1.6rem;
-  height: 1.6rem;
+  width: 2rem;
+  height: 2rem;
   border: none;
   border-radius: 50%;
   background: var(--gris-claro);
-  font-size: 0.8rem;
+  font-size: 0.85rem;
   line-height: 1;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
+/* Efecto al pasar el cursor. */
 .empleado-accion-btn:hover {
   background: var(--gris-medio);
 }
 
+/* El botón de eliminar se vuelve rojo al pasar el cursor. */
 .empleado-accion-eliminar:hover {
   background: var(--rojo-cancelar);
   color: white;
 }
 
+/* Etiqueta de estado (activo/baja) en forma de píldora. */
 .empleado-estado {
   display: inline-block;
-  margin-bottom: 0.5rem;
-  padding: 0.15rem 0.6rem;
-  border-radius: 12px;
-  background: var(--verde-principal);
-  color: white;
-  font-size: 0.75rem;
-  font-weight: 600;
+  margin-bottom: 0.6rem;
+  padding: 0.2rem 0.7rem;
+  border-radius: 999px;
+  background: var(--verde-suave);
+  color: var(--verde-oscuro);
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 
+/* Versión roja de la etiqueta cuando el empleado está de baja (la clase `baja` la pone el HTML). */
 .empleado-estado.baja {
-  background: var(--rojo-cancelar);
+  background: #fdecec;
+  color: #b3261e;
 }
 
+/* Foto circular (border-radius: 50%). object-fit: cover recorta la imagen para llenar el círculo sin deformarla. */
 .empleado-foto {
-  width: 90px;
-  height: 90px;
+  width: 96px;
+  height: 96px;
   border-radius: 50%;
+  border: 3px solid var(--verde-suave);
   background: var(--gris-claro);
   object-fit: cover;
   display: block;
-  margin: 0 auto 0.8rem;
+  margin: 0 auto 0.9rem;
 }
 
+/* Líneas de datos (nombre, cargo, rendimiento) alineadas a la izquierda. */
 .empleado-card p {
   margin: 0.3rem 0;
   text-align: left;
   font-size: 0.9rem;
+  color: var(--gris-oscuro);
+}
+
+/* Las etiquetas en negrita ("Nombre:", "Cargo:") en el color de texto principal. */
+.empleado-card p strong {
+  color: var(--texto-principal);
 }

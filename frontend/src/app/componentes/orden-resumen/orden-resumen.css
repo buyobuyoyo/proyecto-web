@@ -1,3 +1,4 @@
+/* Panel del resumen de la orden (componente de diseño que aún no usa ninguna página). Columna flex. */
 .orden-resumen {
   display: flex;
   flex-direction: column;
@@ -12,12 +13,14 @@
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
 }
 
+/* Cada fila es una cuadrícula (display: grid) de 4 columnas; `fr` reparte el ancho proporcionalmente. */
 .orden-fila {
   display: grid;
   grid-template-columns: 2fr 1fr 1fr 1fr;
   font-size: 0.85rem;
 }
 
+/* Fila de títulos de columna, con una línea debajo. */
 .orden-encabezado {
   font-weight: 700;
   border-bottom: 1px solid var(--gris-medio);
@@ -25,11 +28,13 @@
   margin-bottom: 0.2rem;
 }
 
+/* Línea con el nombre del encargado. */
 .orden-responsable {
   margin-top: 0.5rem;
   font-size: 0.85rem;
 }
 
+/* Botón rojo para cancelar la orden. */
 .btn-cancelar {
   background: var(--rojo-cancelar);
   color: white;
@@ -39,6 +44,7 @@
   font-weight: 600;
 }
 
+/* Fila del total. margin-top: auto empuja el total y el botón de pago hasta el fondo del panel. */
 .orden-total {
   display: flex;
   justify-content: space-between;
@@ -49,6 +55,7 @@
   padding-top: 0.5rem;
 }
 
+/* Botón verde de pago. */
 .btn-pagar {
   background: var(--verde-principal);
   color: white;

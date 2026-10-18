@@ -1,8 +1,11 @@
 <div class="inventario-layout">
+  <!-- Buscador visual: todavía no está conectado (no filtra la lista). -->
   <input type="text" class="buscador" placeholder="Artículo o Cód. Barras" aria-label="Buscar artículo o código de barras">
 
+  <!-- Fila de categorías: cada una es un botón-filtro con sus acciones de editar y eliminar. -->
   <div class="categorias">
     @for (categoria of categorias(); track categoria.id) {
+      <!-- La clase `activa` se agrega solo a la categoría que está seleccionada. -->
       <span class="categoria-pill" [class.activa]="categoriaSeleccionada() === categoria.id">
         <button
           type="button"
@@ -10,6 +13,7 @@
           (click)="seleccionarCategoria(categoria.id)">
           {{ categoria.nombre }}
         </button>
+        <!-- $event es el objeto del clic; se pasa para poder llamar stopPropagation() en el .ts. -->
         <button type="button" class="categoria-accion" (click)="abrirEditarCategoria(categoria, $event)" aria-label="Editar categoría">✎</button>
         <button type="button" class="categoria-accion" (click)="eliminarCategoria(categoria, $event)" aria-label="Eliminar categoría">×</button>
       </span>
@@ -17,6 +21,7 @@
     <button type="button" class="categoria-nueva" (click)="abrirNuevaCategoria()">+ Nueva categoría</button>
   </div>
 
+  <!-- Tres estados: cargando, error, o la lista de productos. -->
   @if (cargando()) {
     <p class="estado-mensaje">Cargando productos…</p>
   } @else if (error()) {
@@ -25,7 +30,9 @@
     <button type="button" class="btn-agregar" (click)="abrirNuevoProducto()">+ Agregar producto</button>
 
     <div class="productos-grid">
+      <!-- Se recorre la lista YA filtrada por categoría (productosFiltrados es un `computed`). -->
       @for (producto of productosFiltrados(); track producto.id) {
+        <!-- [prop]="..." envía datos a la tarjeta; (evento)="..." escucha lo que ella emite. -->
         <app-producto-card
           [nombre]="producto.nombre"
           [etiqueta]="'$' + producto.precio.toFixed(2) + ' · ' + producto.cantidad + ' en stock'"
@@ -40,11 +47,16 @@
   }
 </div>
 
+<!-- Modal de producto. Sirve para crear y para editar: el título cambia según `productoEditando`.
+     (ngSubmit) se dispara al enviar el formulario (botón Guardar o Enter). -->
 <app-modal
   [abierto]="modalProductoAbierto()"
   [titulo]="productoEditando() ? 'Editar producto' : 'Nuevo producto'"
   (cerrar)="cerrarModalProducto()">
   <form class="form-modal" (ngSubmit)="guardarProducto()">
+    <!-- [(ngModel)] = enlace bidireccional: el campo muestra la variable Y la actualiza al escribir.
+         `name` es obligatorio dentro de un <form> para que ngModel registre el campo.
+         `required`, `min`, `maxlength` son validaciones HTML estándar. -->
     <label>
       Nombre
       <input type="text" name="nombre" [(ngModel)]="formProducto.nombre" required maxlength="100">
@@ -54,6 +66,7 @@
       Categoría
       <select name="id_categoria" [(ngModel)]="formProducto.id_categoria" required>
         @for (categoria of categorias(); track categoria.id) {
+          <!-- [ngValue] guarda el número real (id) y no un texto, como haría `value`. -->
           <option [ngValue]="categoria.id">{{ categoria.nombre }}</option>
         }
       </select>
@@ -79,12 +92,14 @@
       <input type="text" name="tags" [(ngModel)]="formProducto.tags" maxlength="200">
     </label>
 
+    <!-- Mensaje de error devuelto por el backend (por ejemplo "código de barras repetido"). -->
     @if (formError()) {
       <p class="form-error">{{ formError() }}</p>
     }
 
     <div class="form-acciones">
       <button type="button" class="form-btn-cancelar" (click)="cerrarModalProducto()">Cancelar</button>
+      <!-- Se desactiva mientras se guarda (evita doble envío) o si aún no existen categorías. -->
       <button type="submit" class="form-btn-guardar" [disabled]="guardando() || categorias().length === 0">
         {{ guardando() ? 'Guardando…' : 'Guardar' }}
       </button>
@@ -96,6 +111,7 @@
   </form>
 </app-modal>
 
+<!-- Modal de categoría (crear/editar): solo tiene el campo nombre. -->
 <app-modal
   [abierto]="modalCategoriaAbierto()"
   [titulo]="categoriaEditando() ? 'Editar categoría' : 'Nueva categoría'"

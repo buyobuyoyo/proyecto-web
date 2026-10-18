@@ -1,0 +1,137 @@
+<div class="ventas-layout">
+  <!-- Tres estados posibles: cargando, error o la tabla con datos. -->
+  @if (cargando()) {
+    <p class="estado-mensaje">Cargando ventas…</p>
+  } @else if (error()) {
+    <p class="estado-mensaje estado-error">No se pudo cargar la información: {{ error() }}</p>
+  } @else {
+    <div class="ventas-header">
+      <h3>Historial de ventas</h3>
+      <!-- Regresa a la pantalla de cobro (punto de venta). -->
+      <a routerLink="/ventas" class="btn-agregar">← Punto de venta</a>
+      <button type="button" class="btn-agregar" (click)="abrirNuevaVenta()">+ Agregar venta</button>
+    </div>
+
+    <div class="ventas-lista lista-tarjeta">
+      <!-- Fila de encabezados de columna (se oculta en pantallas pequeñas). -->
+      <div class="venta-fila venta-encabezado">
+        <span>Fecha</span>
+        <span>Cajero</span>
+        <span>Total</span>
+        <span>Pago</span>
+        <span>Estado</span>
+        <span></span>
+      </div>
+
+      @for (venta of ventas(); track venta.id) {
+        <div class="venta-fila">
+          <!-- `slice: 0:10` recorta '2026-10-18T05:30:00Z' a '2026-10-18' (solo la fecha). -->
+          <span>{{ venta.fecha | slice: 0:10 }}</span>
+          <!-- `?.` y `??`: si la venta no tiene empleado (null) se muestra "—" en lugar de fallar. -->
+          <span>{{ venta.empleado?.nombre ?? '—' }}</span>
+          <!-- toFixed(2) muestra siempre 2 decimales (por ejemplo 12.50). -->
+          <span>${{ venta.total.toFixed(2) }}</span>
+          <span>{{ venta.metodo_pago ?? '—' }}</span>
+          <!-- [class]="'estado-' + ..." pone una clase distinta según el estado (color de la etiqueta). -->
+          <span class="venta-estado" [class]="'estado-' + venta.estado">{{ venta.estado }}</span>
+          <span class="venta-acciones">
+            <button type="button" class="venta-accion" (click)="abrirEditarVenta(venta)" aria-label="Editar venta">✎</button>
+            <button type="button" class="venta-accion" (click)="eliminarVenta(venta)" aria-label="Eliminar venta">🗑</button>
+          </span>
+        </div>
+      } @empty {
+        <p class="estado-mensaje">No hay ventas registradas.</p>
+      }
+    </div>
+  }
+</div>
+
+<!-- Modal para crear/editar una venta: encabezado + líneas de productos + descuento + resumen.
+     El título cambia según `ventaEditando`. [(ngModel)] enlaza cada campo con `formVenta`. -->
+<app-modal
+  [abierto]="modalVentaAbierto()"
+  [titulo]="ventaEditando() ? 'Editar venta' : 'Nueva venta'"
+  (cerrar)="cerrarModal()">
+  <form class="form-modal form-venta" (ngSubmit)="guardarVenta()">
+    <label>
+      Cajero / encargado
+      <select name="id_empleado" [(ngModel)]="formVenta.id_empleado" required>
+        @for (empleado of empleados(); track empleado.id) {
+          <!-- [ngValue] guarda el número real (id) y no un texto, como haría `value`. -->
+          <option [ngValue]="empleado.id">{{ empleado.nombre }}</option>
+        }
+      </select>
+    </label>
+
+    <label>
+      Método de pago
+      <select name="metodo_pago" [(ngModel)]="formVenta.metodo_pago" required>
+        <option value="efectivo">Efectivo</option>
+        <option value="tarjeta">Tarjeta</option>
+      </select>
+    </label>
+
+    <label>
+      Estado
+      <select name="estado" [(ngModel)]="formVenta.estado" required>
+        <option value="confirmada">Confirmada</option>
+        <option value="cancelada">Cancelada</option>
+        <option value="devuelta">Devuelta</option>
+      </select>
+    </label>
+
+    <!-- Líneas de la venta: una fila por producto. -->
+    <div class="lineas-compra">
+      <div class="linea-fila linea-encabezado">
+        <span>Producto</span>
+        <span>Cantidad</span>
+        <span>Precio unit.</span>
+        <span></span>
+      </div>
+
+      <!-- `track $index`: las líneas no tienen id propio, así que se identifican por su posición.
+           Cada campo necesita un `name` único dentro del <form> (por eso 'producto' + $index). -->
+      @for (linea of lineas(); track $index) {
+        <div class="linea-fila">
+          <!-- (ngModelChange) se dispara al elegir un producto: rellena su precio automáticamente. -->
+          <select [(ngModel)]="linea.id_producto" [name]="'producto' + $index" (ngModelChange)="autocompletarPrecio($index)" required>
+            <option [ngValue]="null" disabled>Selecciona…</option>
+            @for (producto of productos(); track producto.id) {
+              <option [ngValue]="producto.id">{{ producto.nombre }}</option>
+            }
+          </select>
+          <input type="number" [(ngModel)]="linea.cantidad" [name]="'cantidad' + $index" min="1" step="1" required>
+          <input type="number" [(ngModel)]="linea.precio_unitario" [name]="'precio' + $index" min="0" step="0.01" required>
+          <!-- No se deja quitar la última línea: siempre queda al menos una. -->
+          <button type="button" class="linea-quitar" (click)="quitarLinea($index)" aria-label="Quitar línea" [disabled]="lineas().length === 1">×</button>
+        </div>
+      }
+
+      <button type="button" class="linea-agregar" (click)="agregarLinea()">+ Agregar línea</button>
+    </div>
+
+    <label>
+      Descuento
+      <input type="number" name="descuento" [(ngModel)]="formVenta.descuento" min="0" step="0.01">
+    </label>
+
+    <!-- Resumen calculado a partir de las líneas y el descuento (computed del .ts). -->
+    <div class="venta-resumen">
+      <span>Subtotal <strong>${{ subtotalVenta().toFixed(2) }}</strong></span>
+      <span>Descuento <strong>${{ (formVenta.descuento || 0).toFixed(2) }}</strong></span>
+      <span class="venta-total-final">Total <strong>${{ totalVenta().toFixed(2) }}</strong></span>
+    </div>
+
+    @if (formError()) {
+      <p class="form-error">{{ formError() }}</p>
+    }
+
+    <div class="form-acciones">
+      <button type="button" class="form-btn-cancelar" (click)="cerrarModal()">Cancelar</button>
+      <!-- Se desactiva mientras se guarda para evitar un doble envío. -->
+      <button type="submit" class="form-btn-guardar" [disabled]="guardando()">
+        {{ guardando() ? 'Guardando…' : 'Guardar' }}
+      </button>
+    </div>
+  </form>
+</app-modal>

@@ -1,8 +1,11 @@
+<!-- routerLink navega a otra ruta sin recargar la página (es el href de Angular).
+     routerLinkActive="activo" agrega la clase CSS `activo` al enlace de la página en la que estás. -->
 <nav class="navbar">
   <a routerLink="/finanzas" routerLinkActive="activo" class="nav-link">Finanzas</a>
   <a routerLink="/inventario" routerLinkActive="activo" class="nav-link">Inventario</a>
   <a routerLink="/ventas" routerLinkActive="activo" class="nav-link">Ventas y facturación</a>
   <a routerLink="/compras" routerLinkActive="activo" class="nav-link">Compras (Insumos)</a>
   <a routerLink="/rh" routerLinkActive="activo" class="nav-link">RH</a>
+  <!-- Por ahora "Cerrar sesión" solo regresa al login (todavía no hay sesión real). -->
   <a routerLink="/login" class="nav-link nav-link-salir">Cerrar sesión</a>
 </nav>

@@ -1,7 +1,12 @@
+/*
+   Fondo oscuro que cubre toda la pantalla (position: fixed + inset: 0). z-index alto = se dibuja
+   encima de todo lo demás. Centra el panel con flex.
+ */
 .modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.45);
+  background: rgba(20, 30, 24, 0.5);
+  backdrop-filter: blur(2px);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -9,42 +14,61 @@
   padding: 1rem;
 }
 
+/*
+   Caja blanca del modal. max-height + overflow-y: auto hacen que, si el contenido es largo, el panel
+   se desplace por dentro en vez de salirse de la pantalla.
+ */
 .modal-panel {
   background: white;
-  border-radius: 8px;
+  border-radius: 18px;
   width: 100%;
-  max-width: 420px;
+  max-width: 460px;
   max-height: 90vh;
   overflow-y: auto;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.25);
 }
 
+/* Encabezado con el título y la X. position: sticky lo deja fijo arriba mientras se desplaza el contenido. */
 .modal-header {
+  position: sticky;
+  top: 0;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 1rem 1.2rem;
-  border-bottom: 1px solid var(--gris-medio);
+  padding: 1.1rem 1.4rem;
+  border-bottom: 1px solid var(--borde);
+  background: white;
 }
 
+/* Título del modal sin margen extra. */
 .modal-header h3 {
   margin: 0;
-  font-size: 1.1rem;
+  font-size: 1.15rem;
 }
 
+/* Botón redondo de cerrar (×). */
 .modal-cerrar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
   border: none;
-  background: none;
-  font-size: 1.5rem;
+  border-radius: 50%;
+  background: var(--gris-claro);
+  font-size: 1.3rem;
   line-height: 1;
   color: var(--gris-oscuro);
   padding: 0;
 }
 
+/* Al pasar el cursor, el botón se oscurece. */
 .modal-cerrar:hover {
+  background: var(--gris-medio);
   color: var(--texto-principal);
 }
 
+/* Espacio interior donde se coloca el formulario proyectado con <ng-content>. */
 .modal-contenido {
-  padding: 1.2rem;
+  padding: 1.4rem;
 }

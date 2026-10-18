@@ -1,17 +1,21 @@
 // /api/ventas -> ventas del punto de venta.
 // Igual que en compras: cada operación corre en una transacción para que la venta,
 // sus líneas, el descuento de stock y el ingreso en finanzas se guarden juntos o ninguno.
+//
+// Es el espejo de compras.js: aquí el stock BAJA (se vende) en vez de subir (se compra).
 const express = require('express');
 const { pool, conTransaccion } = require('../config/db');
 const { ErrorNegocio } = require('../utils/errores');
 const { soloColumnas, anidar, isoAMysql, mysqlAIso } = require('../utils/datos');
 
 const router = express.Router();
+// Columnas del encabezado de la venta que el cliente puede escribir.
 const COLUMNAS_VENTA = ['fecha', 'id_empleado', 'subtotal', 'descuento', 'total', 'metodo_pago', 'estado'];
 
 // Prepara el objeto venta que manda Angular para guardarlo en MySQL (convierte la fecha).
 function ventaParaGuardar(venta) {
   const datos = soloColumnas(venta, COLUMNAS_VENTA);
+  // Angular manda la fecha en formato ISO con 'Z'; MySQL la quiere sin ella (ver utils/datos.js).
   if (datos.fecha) datos.fecha = isoAMysql(datos.fecha);
   return datos;
 }
@@ -25,6 +29,7 @@ router.get('/', async (req, res) => {
           ORDER BY venta.fecha DESC, venta.id DESC`,
     nestTables: true,
   });
+  // Además de anidar el empleado, la fecha se devuelve en ISO (camino inverso de isoAMysql).
   res.json(anidar(filas, 'venta', 'empleado').map((v) => ({ ...v, fecha: mysqlAIso(v.fecha) })));
 });
 
@@ -44,10 +49,12 @@ router.get('/:id/detalles', async (req, res) => {
 });
 
 // Crear venta. Body: { venta: {...}, lineas: [{ id_producto, cantidad, precio_unitario }] }
+// Es la ruta que usa la pantalla de cajero al pulsar "Cobrar".
 router.post('/', async (req, res) => {
   const { venta, lineas } = req.body;
   if (!venta) throw new ErrorNegocio('Faltan los datos de la venta.');
 
+  // Una sola transacción: si no hay stock suficiente, no queda ni la venta ni el ingreso.
   const id = await conTransaccion(async (conexion) => {
     const [resultado] = await conexion.query('INSERT INTO venta SET ?', [ventaParaGuardar(venta)]);
     await guardarLineas(conexion, resultado.insertId, lineas);
@@ -81,6 +88,7 @@ router.put('/:id', async (req, res) => {
     await conexion.query('DELETE FROM detalle_venta WHERE id_venta = ?', [id]);
     await guardarLineas(conexion, id, lineas);
 
+    // Solo se descuenta stock y se registra el ingreso cuando la venta PASA a "confirmada".
     if (venta.estado === 'confirmada' && estadoAnterior !== 'confirmada') {
       await descontarStock(conexion, lineas);
       await registrarIngreso(conexion, venta, id);
@@ -90,8 +98,10 @@ router.put('/:id', async (req, res) => {
   res.json({ ok: true });
 });
 
+// Eliminar venta. Nota: no devuelve el stock ni quita el ingreso si ya estaba confirmada.
 router.delete('/:id', async (req, res) => {
   await conTransaccion(async (conexion) => {
+    // Primero las líneas (llave foránea hacia la venta) y luego el encabezado.
     await conexion.query('DELETE FROM detalle_venta WHERE id_venta = ?', [req.params.id]);
     const [resultado] = await conexion.query('DELETE FROM venta WHERE id = ?', [req.params.id]);
     if (resultado.affectedRows === 0) throw new ErrorNegocio('Venta no encontrada.', 404);
@@ -99,8 +109,10 @@ router.delete('/:id', async (req, res) => {
   res.json({ ok: true });
 });
 
+// Inserta las líneas de una venta dentro de la transacción en curso.
 async function guardarLineas(conexion, idVenta, lineas) {
   if (!Array.isArray(lineas) || lineas.length === 0) return;
+  // Un solo INSERT con todas las filas (`VALUES ?` espera un arreglo de arreglos).
   const filas = lineas.map((l) => [idVenta, l.id_producto, l.cantidad, l.precio_unitario]);
   await conexion.query(
     'INSERT INTO detalle_venta (id_venta, id_producto, cantidad, precio_unitario) VALUES ?',
@@ -112,11 +124,12 @@ async function guardarLineas(conexion, idVenta, lineas) {
 // si no alcanza, el UPDATE no modifica nada y se cancela toda la venta con un mensaje claro.
 async function descontarStock(conexion, lineas) {
   for (const linea of lineas ?? []) {
-    if (!linea.id_producto) continue;
+    if (!linea.id_producto) continue; // línea sin producto elegido: se ignora
     const [resultado] = await conexion.query(
       'UPDATE producto SET cantidad = cantidad - ? WHERE id = ? AND cantidad >= ?',
       [linea.cantidad, linea.id_producto, linea.cantidad],
     );
+    // 0 filas afectadas = no existe el producto o no alcanza el stock; 409 = conflicto.
     if (resultado.affectedRows === 0) {
       throw new ErrorNegocio(`Stock insuficiente para el producto #${linea.id_producto}.`, 409);
     }
@@ -126,6 +139,7 @@ async function descontarStock(conexion, lineas) {
 // Registra el ingreso de la venta en `finanza` (solo la fecha, sin la hora).
 async function registrarIngreso(conexion, venta, idVenta) {
   await conexion.query('INSERT INTO finanza (fecha, tipo, monto, origen) VALUES (?, ?, ?, ?)', [
+    // `slice(0, 10)` conserva 'YYYY-MM-DD' de la fecha ISO; la tabla finanza guarda solo el día.
     venta.fecha.slice(0, 10),
     'ingreso_venta',
     venta.total,

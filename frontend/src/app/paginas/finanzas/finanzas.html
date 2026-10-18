@@ -1,3 +1,4 @@
+<!-- Tres estados posibles: cargando, error o la página con datos. -->
 @if (cargando()) {
   <p class="estado-mensaje">Cargando finanzas…</p>
 } @else if (error()) {
@@ -5,16 +6,27 @@
 } @else {
   <div class="finanzas-layout">
     <section class="finanzas-izquierda">
+      <!-- Tarjetas con el total de cada tipo (vienen del `computed` totales de finanzas.ts). -->
       <div class="finanzas-totales">
-        <p>Gastos en insumos (Totales): <strong>${{ totales().insumos.toFixed(2) }}</strong></p>
-        <p>Gastos en personal (Totales): <strong>${{ totales().personal.toFixed(2) }}</strong></p>
-        <p>Ventas (Totales): <strong>${{ totales().ventas.toFixed(2) }}</strong></p>
+        <div class="total-card total-ventas">
+          <span>Ventas</span>
+          <strong>${{ totales().ventas.toFixed(2) }}</strong>
+        </div>
+        <div class="total-card total-insumos">
+          <span>Gastos en insumos</span>
+          <strong>${{ totales().insumos.toFixed(2) }}</strong>
+        </div>
+        <div class="total-card total-personal">
+          <span>Gastos en personal</span>
+          <strong>${{ totales().personal.toFixed(2) }}</strong>
+        </div>
       </div>
 
+      <!-- Resumen por día (con scroll): una tarjeta por fecha. -->
       <div class="finanzas-scrollbox">
         @for (dia of finanzasPorDia(); track dia.fecha) {
           <div class="finanzas-dia">
-            <p class="finanzas-fecha">Fecha: {{ dia.fecha }}</p>
+            <p class="finanzas-fecha">{{ dia.fecha }}</p>
             <p>Gastos en insumos: {{ dia.insumos.toFixed(2) }}</p>
             <p>Gastos en personal: {{ dia.personal.toFixed(2) }}</p>
             <p>Ventas: {{ dia.ventas.toFixed(2) }}</p>
@@ -25,6 +37,8 @@
       </div>
     </section>
 
+    <!-- Gráfico de barras hecho solo con CSS: cada barra es un <div> cuya altura es un
+         porcentaje del total más alto (maxTotal). [style.height.%] enlaza esa altura. -->
     <section class="finanzas-derecha">
       <h3>Gráficos</h3>
       <div class="grafico-barras">
@@ -44,14 +58,15 @@
     </section>
   </div>
 
+  <!-- Lista completa de movimientos con acciones de editar y eliminar. -->
   <section class="movimientos-seccion">
     <div class="movimientos-header">
       <h3>Movimientos</h3>
       <button type="button" class="btn-agregar" (click)="abrirNuevoRegistro()">+ Agregar movimiento</button>
     </div>
-    <p class="estado-mensaje"></p>
 
-    <div class="movimientos-lista">
+    <div class="movimientos-lista lista-tarjeta">
+      <!-- Fila de encabezados de columna (se oculta en pantallas pequeñas). -->
       <div class="movimiento-fila movimiento-encabezado">
         <span>Fecha</span>
         <span>Tipo</span>
@@ -63,8 +78,10 @@
       @for (registro of registros(); track registro.id) {
         <div class="movimiento-fila">
           <span>{{ registro.fecha }}</span>
+          <!-- [class]="'tipo-' + ..." pone una clase distinta según el tipo (color de la etiqueta). -->
           <span class="movimiento-tipo" [class]="'tipo-' + registro.tipo">{{ registro.tipo }}</span>
           <span>${{ registro.monto.toFixed(2) }}</span>
+          <!-- `??` muestra "—" cuando el movimiento no tiene origen (null). -->
           <span>{{ registro.origen ?? '—' }}</span>
           <span class="movimiento-acciones">
             <button type="button" class="movimiento-accion" (click)="abrirEditarRegistro(registro)" aria-label="Editar movimiento">✎</button>
@@ -78,6 +95,8 @@
   </section>
 }
 
+<!-- Modal para crear/editar un movimiento. El título cambia según `registroEditando`.
+     [(ngModel)] enlaza cada campo con una propiedad de `formRegistro` en ambos sentidos. -->
 <app-modal
   [abierto]="modalAbierto()"
   [titulo]="registroEditando() ? 'Editar movimiento' : 'Nuevo movimiento'"
@@ -107,12 +126,14 @@
       <input type="text" name="origen" [(ngModel)]="formRegistro.origen" maxlength="100" placeholder="Ej. Nómina quincenal">
     </label>
 
+    <!-- Error devuelto por el backend, si lo hubo. -->
     @if (formError()) {
       <p class="form-error">{{ formError() }}</p>
     }
 
     <div class="form-acciones">
       <button type="button" class="form-btn-cancelar" (click)="cerrarModal()">Cancelar</button>
+      <!-- Se desactiva mientras se guarda para evitar un doble envío. -->
       <button type="submit" class="form-btn-guardar" [disabled]="guardando()">
         {{ guardando() ? 'Guardando…' : 'Guardar' }}
       </button>

@@ -1,62 +1,91 @@
+/*
+   Pantalla dividida en dos mitades en fila (flex): formulario a la izquierda, imagen a la derecha.
+   min-height: 100vh = al menos toda la altura de la ventana.
+ */
 .login-pantalla {
   display: flex;
   min-height: 100vh;
 }
 
+/* Mitad del formulario: columna centrada vertical y horizontalmente (justify-content / align-items). */
 .login-panel {
   flex: 1;
   display: flex;
   flex-direction: column;
+  align-items: center;
   justify-content: center;
   gap: 1rem;
-  padding: 3rem 4rem;
+  padding: 3rem 2rem;
   background: white;
 }
 
+/* `> *` = todos los hijos directos del panel: ocupan el ancho disponible pero sin pasar de 380 px. */
+.login-panel > * {
+  width: 100%;
+  max-width: 380px;
+}
+
+/*
+   El archivo del logo es un cuadrado con mucho blanco; object-fit: cover con esta altura recorta el
+   renglón del texto.
+ */
 .login-logo {
-  max-width: 220px;
-  margin-bottom: 1rem;
+  width: 260px;
+  height: 56px;
+  object-fit: cover;
+  margin-bottom: 1.5rem;
 }
 
+/* Campos de usuario y contraseña. */
 .login-input {
-  padding: 0.7rem 1rem;
+  padding: 0.85rem 1rem;
   border: 1px solid var(--gris-medio);
-  border-radius: 4px;
+  border-radius: var(--radio-chico);
   font-size: 1rem;
-  transition: border-color 0.15s ease;
+  transition: border-color 0.15s ease, outline-color 0.15s ease;
 }
 
+/* Al enfocar un campo: borde verde y un halo suave. */
 .login-input:focus-visible {
   border-color: var(--verde-principal);
+  outline: 3px solid var(--verde-suave);
+  outline-offset: 0;
 }
 
+/* Botón ENTRAR (es un enlace <a> con aspecto de botón). */
 .login-boton {
   text-align: center;
   background: var(--verde-principal);
   color: white;
-  padding: 0.8rem;
-  border-radius: 4px;
+  padding: 0.95rem;
+  border-radius: 999px;
   font-weight: 700;
+  letter-spacing: 0.04em;
   text-decoration: none;
   margin-top: 0.5rem;
+  box-shadow: 0 4px 14px rgba(47, 174, 106, 0.35);
   transition: background 0.15s ease;
 }
 
+/* Al pasar el cursor se oscurece. */
 .login-boton:hover {
   background: var(--verde-oscuro);
 }
 
+/* Mensaje de error en rojo. */
 .login-error {
   color: var(--rojo-cancelar);
   font-size: 0.9rem;
   margin: 0;
 }
 
+/* Mitad de la imagen: un degradado verde de respaldo por si la imagen no carga. */
 .login-decorativo {
-  flex: 1;
+  flex: 1.2;
   background: linear-gradient(135deg, var(--verde-principal), var(--verde-oscuro));
 }
 
+/* La imagen llena toda la mitad (object-fit: cover la recorta sin deformarla). */
 .login-imagen {
   width: 100%;
   height: 100%;
@@ -64,6 +93,7 @@
   display: block;
 }
 
+/* Celular: las dos mitades se apilan en vertical (flex-direction: column) y la imagen se acorta. */
 @media screen and (max-width: 700px) {
   .login-pantalla {
     flex-direction: column;
@@ -71,6 +101,11 @@
 
   .login-panel {
     padding: 2.5rem 1.5rem;
+  }
+
+  .login-logo {
+    width: 200px;
+    height: 44px;
   }
 
   .login-decorativo {

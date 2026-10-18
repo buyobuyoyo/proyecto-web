@@ -1,12 +1,17 @@
+<!-- Pantalla dividida en dos mitades: formulario a la izquierda, imagen a la derecha. -->
 <div class="login-pantalla">
   <div class="login-panel">
     <img src="/imagenes/logo.png" alt="Logo" class="login-logo">
 
+    <!-- aria-label da un nombre al campo para lectores de pantalla (no hay <label> visible).
+         `autocomplete` ayuda al navegador a ofrecer guardar/rellenar las credenciales. -->
     <input type="text" class="login-input" placeholder="Usuario" name="usuario" autocomplete="username" aria-label="Usuario">
     <input type="password" class="login-input" placeholder="Contraseña" name="password" autocomplete="current-password" aria-label="Contraseña">
 
+    <!-- Por ahora es un enlace que lleva a /finanzas; no comprueba las credenciales. -->
     <a routerLink="/finanzas" class="login-boton" role="button">ENTRAR</a>
 
+    <!-- Mensaje fijo de ejemplo: todavía no se muestra según un error real. -->
     <p class="login-error">Error: Credenciales incorrectas</p>
   </div>
 

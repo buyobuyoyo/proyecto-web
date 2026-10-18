@@ -1,4 +1,5 @@
 <div class="orden-resumen">
+  <!-- Fila de encabezados de columna. -->
   <div class="orden-fila orden-encabezado">
     <span>Nombre</span>
     <span>Cant.</span>
@@ -6,11 +7,13 @@
     <span>Total</span>
   </div>
 
+  <!-- Una fila por producto del pedido (ver @for en orden-compra.html). -->
   @for (item of items(); track item.nombre) {
     <div class="orden-fila">
       <span>{{ item.nombre }}</span>
       <span>{{ item.cantidad }}</span>
       <span>{{ item.precio.toFixed(2) }}</span>
+      <!-- Total de la línea = cantidad × precio. -->
       <span>{{ (item.cantidad * item.precio).toFixed(2) }}</span>
     </div>
   }

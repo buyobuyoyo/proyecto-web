@@ -1,3 +1,4 @@
+/* Panel de la orden de compra (componente de diseño que aún no usa ninguna página). Columna flex. */
 .orden-compra {
   display: flex;
   flex-direction: column;
@@ -12,12 +13,14 @@
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
 }
 
+/* Cada fila es una cuadrícula (display: grid) de 5 columnas; `fr` reparte el ancho proporcionalmente. */
 .orden-fila {
   display: grid;
   grid-template-columns: 1.6fr 0.7fr 0.9fr 1.3fr 0.9fr;
   font-size: 0.85rem;
 }
 
+/* Fila de títulos de columna, con una línea debajo. */
 .orden-encabezado {
   font-weight: 700;
   border-bottom: 1px solid var(--gris-medio);
@@ -25,6 +28,7 @@
   margin-bottom: 0.2rem;
 }
 
+/* Botón rojo para cancelar la orden. */
 .btn-cancelar {
   background: var(--rojo-cancelar);
   color: white;
@@ -34,6 +38,7 @@
   font-weight: 600;
 }
 
+/* Fila del total. margin-top: auto empuja el total y el botón de pago hasta el fondo del panel. */
 .orden-total {
   display: flex;
   justify-content: space-between;
@@ -44,6 +49,7 @@
   padding-top: 0.5rem;
 }
 
+/* Botón verde de pago. */
 .btn-pagar {
   background: var(--verde-principal);
   color: white;

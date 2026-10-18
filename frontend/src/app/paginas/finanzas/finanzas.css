@@ -1,9 +1,14 @@
+/* Dos columnas en fila: totales + resumen por día a la izquierda, gráfico a la derecha. */
 .finanzas-layout {
   display: flex;
   gap: 1.5rem;
   align-items: flex-start;
 }
 
+/*
+   Columna izquierda: sus bloques se apilan con espacio entre ellos. min-width: 0 permite que se encoja
+   sin desbordar su contenedor.
+ */
 .finanzas-izquierda {
   flex: 1;
   min-width: 0;
@@ -12,20 +17,62 @@
   gap: 1rem;
 }
 
+/*
+   Las tres tarjetas de totales en una cuadrícula que se adapta: repeat(auto-fit, minmax(140px, 1fr))
+   significa "tantas columnas de al menos 140 px como quepan".
+ */
 .finanzas-totales {
-  background: var(--gris-claro);
-  border-radius: 8px;
-  padding: 1rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 0.8rem;
 }
 
-.finanzas-totales p {
-  margin: 0.3rem 0;
+/* Tarjeta de un total, con una franja de color a la izquierda (border-left). */
+.total-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--borde);
+  border-left: 4px solid var(--gris-medio);
+  border-radius: var(--radio);
+  background: white;
+  box-shadow: var(--sombra);
 }
 
+/* Título pequeño de la tarjeta. */
+.total-card span {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--texto-suave);
+}
+
+/* Cifra grande del total. */
+.total-card strong {
+  font-size: 1.5rem;
+  letter-spacing: -0.02em;
+}
+
+/* Color de la franja según el tipo: ventas (verde)... */
+.total-ventas {
+  border-left-color: var(--verde-principal);
+}
+
+/* ...gastos en insumos (rojo)... */
+.total-insumos {
+  border-left-color: #e5484d;
+}
+
+/* ...y gastos en personal (amarillo). */
+.total-personal {
+  border-left-color: #f2b705;
+}
+
+/* Caja con el resumen por día: altura máxima y scroll vertical propio (overflow-y: auto). */
 .finanzas-scrollbox {
   background: var(--gris-claro);
-  border-radius: 8px;
-  padding: 0.5rem;
+  border-radius: var(--radio);
+  padding: 0.6rem;
   max-height: 260px;
   overflow-y: auto;
   display: flex;
@@ -33,42 +80,58 @@
   gap: 0.5rem;
 }
 
+/* Tarjeta de un día. */
 .finanzas-dia {
   background: white;
-  border-radius: 6px;
-  padding: 0.7rem;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08);
+  border-radius: var(--radio-chico);
+  padding: 0.8rem 0.9rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
 }
 
+/* Líneas de ese día (insumos, personal, ventas). */
 .finanzas-dia p {
   margin: 0.15rem 0;
   font-size: 0.9rem;
+  color: var(--gris-oscuro);
 }
 
+/* La fecha en negrita. `!important` hace que esta regla gane a la de `.finanzas-dia p`, que tiene el mismo peso. */
 .finanzas-fecha {
   font-weight: 700;
+  color: var(--texto-principal) !important;
 }
 
+/* Tarjeta que contiene el gráfico. */
 .finanzas-derecha {
   flex: 1;
   min-width: 0;
-  border: 1px solid var(--gris-medio);
-  border-radius: 8px;
-  padding: 1rem;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  padding: 1.2rem;
   background: white;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.06);
+  box-shadow: var(--sombra);
 }
 
+/* Título "Gráficos" sin margen superior. */
+.finanzas-derecha h3 {
+  margin: 0 0 0.5rem;
+}
+
+/*
+   Área del gráfico: las barras se alinean abajo (align-items: flex-end) y reparten el ancho. El borde
+   inferior hace de eje X.
+ */
 .grafico-barras {
   display: flex;
   align-items: flex-end;
   justify-content: space-around;
   gap: 0.75rem;
-  height: 220px;
-  border-bottom: 2px solid var(--gris-oscuro);
+  height: 240px;
+  border-bottom: 2px solid var(--borde);
   padding-top: 1rem;
 }
 
+/* Cada barra + su etiqueta en columna, pegada abajo (justify-content: flex-end). */
 .barra-grupo {
   display: flex;
   flex-direction: column;
@@ -79,55 +142,44 @@
   min-width: 0;
 }
 
+/* Etiqueta bajo la barra. */
 .barra-grupo span {
   font-size: 0.85rem;
   white-space: nowrap;
+  color: var(--texto-suave);
 }
 
+/* La barra en sí: su altura la fija el HTML en porcentaje ([style.height.%]); transition anima los cambios. */
 .barra {
-  width: 50px;
-  border-radius: 4px 4px 0 0;
+  width: 56px;
+  border-radius: 8px 8px 0 0;
+  transition: height 0.4s ease;
 }
 
-@media (max-width: 800px) {
-  .finanzas-layout {
-    flex-direction: column;
-  }
-
-  .finanzas-scrollbox {
-    max-height: 320px;
-  }
-}
-
-@media (max-width: 420px) {
-  .barra {
-    width: 34px;
-  }
-
-  .barra-grupo span {
-    font-size: 0.75rem;
-  }
-}
-
+/* Color de cada barra. */
 .barra-insumos {
   background: #e5484d;
 }
 
+/*  */
 .barra-personal {
   background: #f2b705;
 }
 
+/*  */
 .barra-ventas {
   background: var(--verde-principal);
 }
 
+/* Sección inferior: lista de todos los movimientos. */
 .movimientos-seccion {
   margin-top: 1.5rem;
   display: flex;
   flex-direction: column;
-  gap: 0.6rem;
+  gap: 0.8rem;
 }
 
+/* Fila con el título a la izquierda y el botón "+ Agregar movimiento" a la derecha. */
 .movimientos-header {
   display: flex;
   align-items: center;
@@ -136,79 +188,105 @@
   gap: 0.6rem;
 }
 
+/* Título sin margen. */
 .movimientos-header h3 {
   margin: 0;
 }
 
-.movimientos-lista {
-  display: flex;
-  flex-direction: column;
-  border: 1px solid var(--gris-medio);
-  border-radius: 8px;
-  overflow: hidden;
-  background: white;
-}
-
+/*
+   Cada fila es una cuadrícula (display: grid) de 5 columnas; `fr` reparte el ancho proporcionalmente.
+   La última columna (5rem) es para los botones.
+ */
 .movimiento-fila {
   display: grid;
-  grid-template-columns: 1fr 1.2fr 0.9fr 1.4fr 4.5rem;
+  grid-template-columns: 1fr 1.2fr 0.9fr 1.4fr 5rem;
   align-items: center;
   gap: 0.5rem;
-  padding: 0.7rem 1rem;
+  padding: 0.85rem 1.2rem;
   border-bottom: 1px solid var(--gris-claro);
 }
 
+/* La última fila no lleva línea inferior. */
 .movimiento-fila:last-child {
   border-bottom: none;
 }
 
+/* Fila de títulos de columna: mayúsculas pequeñas y fondo suave. */
 .movimiento-encabezado {
+  font-size: 0.78rem;
   font-weight: 700;
-  background: var(--gris-claro);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--texto-suave);
+  background: #f8faf7;
 }
 
+/* Etiqueta de tipo (píldora de color). */
 .movimiento-tipo {
   display: inline-block;
   width: fit-content;
-  padding: 0.15rem 0.6rem;
-  border-radius: 12px;
+  padding: 0.2rem 0.7rem;
+  border-radius: 999px;
   font-size: 0.75rem;
-  font-weight: 600;
+  font-weight: 700;
   color: white;
 }
 
+/* Color de la etiqueta según el tipo de movimiento (la clase se arma en el HTML con el valor de `tipo`). */
 .tipo-ingreso_venta {
   background: var(--verde-principal);
 }
 
+/*  */
 .tipo-gasto_insumo {
   background: #e5484d;
 }
 
+/*  */
 .tipo-gasto_personal {
   background: #f2b705;
   color: var(--texto-principal);
 }
 
+/* Contenedor de los botones editar/eliminar. */
 .movimiento-acciones {
   display: flex;
   gap: 0.3rem;
 }
 
+/* Botón redondo de acción. */
 .movimiento-accion {
   border: none;
   background: var(--gris-claro);
   border-radius: 50%;
-  width: 1.6rem;
-  height: 1.6rem;
-  font-size: 0.8rem;
+  width: 2rem;
+  height: 2rem;
+  font-size: 0.85rem;
   line-height: 1;
 }
 
+/* Efecto al pasar el cursor. */
 .movimiento-accion:hover {
   background: var(--gris-medio);
 }
 
+/* Pantallas de hasta 800 px: las dos columnas se apilan. */
+@media (max-width: 800px) {
+  .finanzas-layout {
+    flex-direction: column;
+  }
+
+  .finanzas-izquierda,
+  .finanzas-derecha {
+    width: 100%;
+  }
+
+  .finanzas-scrollbox {
+    max-height: 320px;
+  }
+}
+
+/* Celular: las filas de movimientos pasan a 2 columnas y se oculta la fila de encabezados. */
 @media (max-width: 700px) {
   .movimiento-fila {
     grid-template-columns: 1fr 1fr;
@@ -216,5 +294,16 @@
 
   .movimiento-encabezado {
     display: none;
+  }
+}
+
+/* Pantallas muy pequeñas: barras y etiquetas del gráfico más compactas. */
+@media (max-width: 420px) {
+  .barra {
+    width: 38px;
+  }
+
+  .barra-grupo span {
+    font-size: 0.75rem;
   }
 }

@@ -1,3 +1,7 @@
+/*
+   Barra superior verde. display: flex pone los enlaces en fila; flex-wrap deja que pasen a otra línea si
+   no caben; justify-content: space-around reparte el espacio libre entre ellos.
+ */
 .navbar {
   display: flex;
   flex-wrap: wrap;
@@ -9,6 +13,7 @@
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.15);
 }
 
+/* Cada enlace de la barra: texto blanco, sin subrayado y con forma de botón redondeado. */
 .nav-link {
   color: white;
   text-decoration: none;
@@ -20,6 +25,7 @@
   transition: background 0.15s ease;
 }
 
+/* Pantallas de hasta 700 px (celular): los enlaces se centran y el texto se reduce un poco. */
 @media (max-width: 700px) {
   .navbar {
     justify-content: center;
@@ -32,24 +38,29 @@
   }
 }
 
+/* :hover = cuando el cursor está encima: el fondo se oscurece. */
 .nav-link:hover {
   background: var(--verde-oscuro);
 }
 
+/* Enlace de la página actual (la clase `activo` la pone routerLinkActive de Angular). */
 .nav-link.activo {
   background: var(--verde-oscuro);
   text-decoration: underline;
 }
 
+/* "Cerrar sesión": margin-left: auto lo empuja al extremo derecho de la barra. */
 .nav-link-salir {
   margin-left: auto;
   background: rgba(0, 0, 0, 0.15);
 }
 
+/* Al pasar el cursor sobre "Cerrar sesión" se pone rojo. */
 .nav-link-salir:hover {
   background: #b3261e;
 }
 
+/* En celular, "Cerrar sesión" deja de ir a la derecha y se alinea con los demás. */
 @media (max-width: 700px) {
   .nav-link-salir {
     margin-left: 0;

@@ -1,0 +1,234 @@
+/* Página en una columna con espacio entre el encabezado y la tabla. */
+.ventas-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+/* Fila con el título y los botones; flex-wrap los deja saltar de línea en pantallas angostas. */
+.ventas-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+}
+
+/* Título sin margen; margin-right: auto lo mantiene a la izquierda y empuja los botones a la derecha. */
+.ventas-header h3 {
+  margin: 0;
+  margin-right: auto;
+}
+
+/* El enlace "← Punto de venta" es secundario: fondo blanco con borde en lugar de verde. */
+.ventas-header a.btn-agregar {
+  background: white;
+  color: var(--gris-oscuro);
+  border: 1px solid var(--gris-medio);
+  box-shadow: none;
+}
+
+/* Contenedor de la tabla (la apariencia de tarjeta viene de .lista-tarjeta, en styles.css). */
+.ventas-lista {
+  display: flex;
+  flex-direction: column;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  overflow: hidden;
+  background: white;
+}
+
+/*
+   Cada fila es una cuadrícula (display: grid) de 6 columnas; `fr` reparte el ancho proporcionalmente.
+   La última columna (5rem) es para los botones.
+ */
+.venta-fila {
+  display: grid;
+  grid-template-columns: 1fr 1.2fr 0.8fr 0.8fr 0.9fr 5rem;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.85rem 1.2rem;
+  border-bottom: 1px solid var(--gris-claro);
+}
+
+/* La última fila no lleva línea inferior. */
+.venta-fila:last-child {
+  border-bottom: none;
+}
+
+/* Fila de títulos de columna: mayúsculas pequeñas y fondo suave. */
+.venta-encabezado {
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--texto-suave);
+  background: #f8faf7;
+}
+
+/* Etiqueta de estado (píldora de color). */
+.venta-estado {
+  display: inline-block;
+  width: fit-content;
+  padding: 0.2rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  text-transform: capitalize;
+  color: white;
+}
+
+/* Color de la etiqueta según el estado (la clase se arma en el HTML con el valor de `estado`). */
+.estado-confirmada {
+  background: var(--verde-principal);
+}
+
+/*  */
+.estado-cancelada {
+  background: var(--rojo-cancelar);
+}
+
+/*  */
+.estado-devuelta {
+  background: var(--gris-oscuro);
+}
+
+/* Contenedor de los botones editar/eliminar de cada fila. */
+.venta-acciones {
+  display: flex;
+  gap: 0.3rem;
+}
+
+/* Botón redondo de acción. */
+.venta-accion {
+  border: none;
+  background: var(--gris-claro);
+  border-radius: 50%;
+  width: 2rem;
+  height: 2rem;
+  font-size: 0.8rem;
+  line-height: 1;
+}
+
+/* Efecto al pasar el cursor. */
+.venta-accion:hover {
+  background: var(--gris-medio);
+}
+
+/* Líneas de producto dentro del modal (mismo patrón visual que Compras) */
+
+/* Bloque de líneas de producto dentro del modal, separado por líneas arriba y abajo. */
+.lineas-compra {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  border-top: 1px solid var(--gris-claro);
+  border-bottom: 1px solid var(--gris-claro);
+  padding: 0.8rem 0;
+}
+
+/* Una línea del formulario: 4 columnas (producto, cantidad, precio, botón de quitar). */
+.linea-fila {
+  display: grid;
+  grid-template-columns: 1.6fr 0.7fr 0.9fr 2rem;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+/* Títulos pequeños sobre las columnas. */
+.linea-encabezado {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--gris-oscuro);
+}
+
+.linea-fila select,
+/* Aspecto de los campos de cada línea (el selector de producto comparte estilo). */
+.linea-fila input {
+  padding: 0.4rem 0.5rem;
+  border: 1px solid var(--gris-medio);
+  border-radius: 8px;
+  font-size: 0.9rem;
+}
+
+/* Botón × que quita la línea. */
+.linea-quitar {
+  border: none;
+  background: var(--gris-claro);
+  border-radius: 4px;
+  height: 1.8rem;
+  font-size: 1rem;
+  line-height: 1;
+}
+
+/* Al pasar el cursor se vuelve rojo, salvo que esté desactivado (:not(:disabled)). */
+.linea-quitar:hover:not(:disabled) {
+  background: var(--rojo-cancelar);
+  color: white;
+}
+
+/* Desactivado (cuando solo queda una línea): atenuado y sin cursor de mano. */
+.linea-quitar:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* Botón "+ Agregar línea" con borde punteado. */
+.linea-agregar {
+  align-self: flex-start;
+  border: 1px dashed var(--gris-oscuro);
+  background: none;
+  border-radius: 4px;
+  padding: 0.4rem 0.8rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--gris-oscuro);
+}
+
+/* Al pasar el cursor se vuelve verde. */
+.linea-agregar:hover {
+  border-color: var(--verde-principal);
+  color: var(--verde-principal);
+}
+
+/* Resumen del modal (subtotal, descuento, total) en columna. */
+.venta-resumen {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  font-size: 0.9rem;
+}
+
+/* Cada renglón: etiqueta a la izquierda y valor a la derecha. */
+.venta-resumen span {
+  display: flex;
+  justify-content: space-between;
+}
+
+/* El renglón del total: más grande, en verde y separado por una línea. */
+.venta-total-final {
+  font-weight: 700;
+  color: var(--verde-oscuro);
+  font-size: 1.05rem;
+  border-top: 1px solid var(--gris-claro);
+  padding-top: 0.3rem;
+  margin-top: 0.2rem;
+}
+
+/*
+   Celular: las filas de la tabla pasan a 2 columnas, se oculta la fila de encabezados y las líneas del
+   formulario se apilan.
+ */
+@media (max-width: 700px) {
+  .venta-fila {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .venta-encabezado {
+    display: none;
+  }
+
+  .linea-fila {
+    grid-template-columns: 1fr;
+  }
+}

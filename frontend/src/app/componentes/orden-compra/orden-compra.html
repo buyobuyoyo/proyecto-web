@@ -1,4 +1,5 @@
 <div class="orden-compra">
+  <!-- Fila de encabezados de columna. -->
   <div class="orden-fila orden-encabezado">
     <span>Nombre</span>
     <span>Cant.</span>
@@ -7,12 +8,16 @@
     <span>Total</span>
   </div>
 
+  <!-- @for repite el bloque una vez por elemento de la lista.
+       `track` le dice a Angular cómo identificar cada elemento para actualizar solo lo que cambia. -->
   @for (item of items(); track item.nombre) {
     <div class="orden-fila">
       <span>{{ item.nombre }}</span>
       <span>{{ item.cantidad }}</span>
+      <!-- toFixed(2) muestra siempre 2 decimales (por ejemplo 12.50). -->
       <span>{{ item.precio.toFixed(2) }}</span>
       <span>{{ item.proveedor }}</span>
+      <!-- Total de la línea = cantidad × precio. -->
       <span>{{ (item.cantidad * item.precio).toFixed(2) }}</span>
     </div>
   }

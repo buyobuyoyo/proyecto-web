@@ -1,10 +1,12 @@
 <div class="rh-layout">
+  <!-- Panel izquierdo: cifras de personal (todas salen de los `computed` de rh.ts). -->
   <section class="rh-datos">
     <p>Número de empleados <strong>{{ numEmpleados() }}</strong></p>
     <p>Número total requerido de staff <strong>{{ staffRequerido }}</strong></p>
     <p>Diferencia <strong>{{ diferencia() }}</strong></p>
     <p>
       Estado
+      <!-- Dos clases condicionales: la de abajo pinta de rojo o de verde según el estado. -->
       <strong class="estado" [class.understaffed]="estado() === 'Understaffed'" [class.overstaffed]="estado() === 'Overstaffed'">
         {{ estado() }}
       </strong>
@@ -12,6 +14,7 @@
     <p>Rendimiento <strong>{{ rendimiento() }}%</strong></p>
   </section>
 
+  <!-- Panel derecho: tarjetas de empleados. Tiene tres estados posibles: cargando, error o datos. -->
   <section class="rh-empleados">
     @if (cargando()) {
       <p class="estado-mensaje">Cargando empleados…</p>
@@ -19,6 +22,7 @@
       <p class="estado-mensaje estado-error">No se pudo cargar el personal: {{ error() }}</p>
     } @else {
       <div class="empleados-grid">
+        <!-- Una tarjeta por empleado. Los corchetes pasan datos al componente hijo (sus input()). -->
         @for (empleado of empleados(); track empleado.id) {
           <app-empleado-card
             [id]="empleado.id"
@@ -28,6 +32,7 @@
             [estado]="empleado.estado"
             [rendimiento]="empleado.rendimiento">
           </app-empleado-card>
+        <!-- @empty se muestra cuando la lista del @for está vacía. -->
         } @empty {
           <p class="estado-mensaje">No hay empleados registrados.</p>
         }
