@@ -53,6 +53,10 @@
 .nav-link-salir {
   margin-left: auto;
   background: rgba(0, 0, 0, 0.15);
+  /* Es un <button>: se le quita el borde y se hereda la tipografía para que se vea como los enlaces. */
+  border: none;
+  font-family: inherit;
+  cursor: pointer;
 }
 
 /* Al pasar el cursor sobre "Cerrar sesión" se pone rojo. */

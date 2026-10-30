@@ -13,5 +13,6 @@ export interface Producto {
   categoria: Categoria | null;
 }
 
-// Lo que se envía al crear/editar: sin `id` (lo asigna MySQL) ni `categoria` (la calcula el JOIN).
-export type ProductoInput = Omit<Producto, 'id' | 'categoria'>;
+// Lo que se envía al crear/editar: sin `id` (lo asigna MySQL), `categoria` (la calcula el JOIN) ni
+// `cantidad` (el stock solo cambia con compras, ventas y devoluciones, no se captura a mano).
+export type ProductoInput = Omit<Producto, 'id' | 'categoria' | 'cantidad'>;

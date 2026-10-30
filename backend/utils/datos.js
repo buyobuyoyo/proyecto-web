@@ -1,4 +1,5 @@
 // Funciones pequeñas para preparar los datos que entran y salen del API.
+const { ErrorNegocio } = require('./errores');
 
 // Deja solo las columnas permitidas de un objeto. Así el cliente no puede
 // colarnos campos que no queremos (ni inventar nombres de columnas en el SQL).
@@ -48,4 +49,19 @@ function mysqlAIso(fecha) {
   return fecha ? fecha.replace(' ', 'T') + 'Z' : fecha;
 }
 
-module.exports = { soloColumnas, anidar, isoAMysql, mysqlAIso };
+// Convierte el :id de una URL en un entero positivo. Si viene algo como "abc", responde 404
+// en vez de dejar que un NaN llegue a SQL y termine en un error 500.
+function leerId(valor) {
+  const id = Number(valor);
+  if (!Number.isInteger(id) || id <= 0) throw new ErrorNegocio('Registro no encontrado.', 404);
+  return id;
+}
+
+// ¿Es 'AAAA-MM-DD' una fecha real? El formato solo no basta: '2026-13-45' lo cumple.
+function esFechaValida(texto) {
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(texto)) return false;
+  const fecha = new Date(`${texto}T00:00:00Z`);
+  return !Number.isNaN(fecha.getTime()) && fecha.toISOString().slice(0, 10) === texto;
+}
+
+module.exports = { soloColumnas, anidar, isoAMysql, mysqlAIso, leerId, esFechaValida };

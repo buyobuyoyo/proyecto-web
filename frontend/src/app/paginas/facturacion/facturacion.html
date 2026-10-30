@@ -1,0 +1,76 @@
+@if (cargando()) {
+  <p class="estado-mensaje">Cargando facturas…</p>
+} @else {
+  <div class="facturacion-layout">
+    <!-- `aviso` = resultado de la última acción (factura generada, correo enviado...). -->
+    @if (aviso()) {
+      <p class="aviso" role="status">{{ aviso() }}</p>
+    }
+    @if (error()) {
+      <p class="estado-mensaje estado-error" role="alert">{{ error() }}</p>
+    }
+
+    <!-- Tabla de facturas ya emitidas (el cliente solo ve las suyas; el backend lo filtra). -->
+    <section>
+      <h2>Facturas</h2>
+      <div class="lista-tarjeta">
+        <table class="tabla">
+          <thead>
+            <tr><th>Folio</th><th>Venta</th><th>Receptor</th><th>Total</th><th>Correo</th><th></th></tr>
+          </thead>
+          <tbody>
+            @for (factura of facturas(); track factura.id) {
+              <tr>
+                <td>{{ factura.folio }}</td>
+                <td>#{{ factura.id_venta }}</td>
+                <td>{{ factura.nombre_receptor }}<small>{{ factura.rfc_receptor }} · {{ factura.correo_receptor }}</small></td>
+                <td>${{ factura.total.toFixed(2) }}</td>
+                <td>
+                  <!-- La clase CSS cambia según el estado del correo (enviado, fallido, omitido...). -->
+                  <span class="etiqueta etiqueta-{{ factura.correo_estado }}" [title]="factura.correo_detalle ?? ''">{{ factura.correo_estado }}</span>
+                </td>
+                <td class="acciones">
+                  <button type="button" class="accion" (click)="descargar(factura)">XML</button>
+                  <button type="button" class="accion" (click)="reenviar(factura)">Reenviar</button>
+                </td>
+              </tr>
+            } @empty {
+              <tr><td colspan="6" class="estado-mensaje">Todavía no hay facturas.</td></tr>
+            }
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- Solo el administrador ve las ventas pendientes de facturar. -->
+    @if (auth.esAdmin()) {
+      <section>
+        <h2>Ventas sin factura</h2>
+        <div class="lista-tarjeta">
+          <table class="tabla">
+            <thead>
+              <tr><th>Venta</th><th>Fecha</th><th>Total</th><th></th></tr>
+            </thead>
+            <tbody>
+              @for (venta of ventasSinFactura(); track venta.id) {
+                <tr>
+                  <td>#{{ venta.id }}</td>
+                  <td>{{ venta.fecha | date: 'dd/MM/yyyy HH:mm' }}</td>
+                  <td>${{ venta.total.toFixed(2) }}</td>
+                  <td class="acciones">
+                    <button type="button" class="accion" (click)="ventaAFacturar.set(venta.id)">Facturar</button>
+                  </td>
+                </tr>
+              } @empty {
+                <tr><td colspan="4" class="estado-mensaje">Todas las ventas confirmadas tienen factura.</td></tr>
+              }
+            </tbody>
+          </table>
+        </div>
+      </section>
+    }
+  </div>
+}
+
+<!-- Modal compartido con Checkout: se abre al elegir una venta y avisa con (creada) al terminar. -->
+<app-factura-modal [idVenta]="ventaAFacturar()" (cerrar)="ventaAFacturar.set(null)" (creada)="alCrear($event)" />

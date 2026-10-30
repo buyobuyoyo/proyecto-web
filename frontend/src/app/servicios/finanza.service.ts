@@ -43,6 +43,25 @@ export class FinanzaService {
     }
   }
 
+  // GET /api/finanzas/exportar-xml -> descarga el libro contable en XML (con el token del interceptor).
+  async exportarXml(desde?: string, hasta?: string): Promise<{ error: string | null }> {
+    try {
+      const params: Record<string, string> = {};
+      if (desde) params['desde'] = desde;
+      if (hasta) params['hasta'] = hasta;
+      const blob = await firstValueFrom(this.http.get(`${this.api}/exportar-xml`, { params, responseType: 'blob' }));
+      const url = URL.createObjectURL(blob);
+      const enlace = document.createElement('a');
+      enlace.href = url;
+      enlace.download = 'contabilidad.xml';
+      enlace.click();
+      URL.revokeObjectURL(url);
+      return { error: null };
+    } catch (e) {
+      return { error: mensajeErrorApi(e) };
+    }
+  }
+
   // DELETE /api/finanzas/:id -> elimina un movimiento.
   async eliminar(id: number): Promise<{ error: string | null }> {
     try {

@@ -13,7 +13,6 @@ function productoVacio(idCategoria: number | null): ProductoInput {
   return {
     nombre: '',
     id_categoria: idCategoria ?? 0,
-    cantidad: 0,
     precio: 0,
     codigo_barras: null,
     tags: null,
@@ -116,7 +115,6 @@ export class Inventario {
     this.formProducto = {
       nombre: producto.nombre,
       id_categoria: producto.id_categoria,
-      cantidad: producto.cantidad,
       precio: producto.precio,
       codigo_barras: producto.codigo_barras,
       tags: producto.tags,

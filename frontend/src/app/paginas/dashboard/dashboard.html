@@ -1,0 +1,85 @@
+@if (cargando()) {
+  <p class="estado-mensaje">Cargando panel…</p>
+} @else if (error() || !datos()) {
+  <p class="estado-mensaje estado-error">No se pudo cargar el panel: {{ error() }}</p>
+} @else {
+  <!-- @let guarda los datos en la variable `d` para no repetir datos()! en cada línea. -->
+  @let d = datos()!;
+  <div class="dashboard-layout">
+    <!-- Tarjetas con los números clave. -->
+    <div class="tarjetas">
+      <div class="tarjeta">
+        <span>Ventas de hoy</span>
+        <strong>${{ d.hoy.total.toFixed(2) }}</strong>
+        <small>{{ d.hoy.ventas }} venta(s)</small>
+      </div>
+      <div class="tarjeta">
+        <span>Ingresos del mes</span>
+        <strong>${{ d.mes.ingresos.toFixed(2) }}</strong>
+      </div>
+      <div class="tarjeta">
+        <span>Gastos del mes</span>
+        <strong>${{ (d.mes.gastosInsumos + d.mes.gastosPersonal).toFixed(2) }}</strong>
+        <small>Insumos ${{ d.mes.gastosInsumos.toFixed(2) }} · Personal ${{ d.mes.gastosPersonal.toFixed(2) }}</small>
+      </div>
+      <div class="tarjeta" [class.tarjeta-negativa]="d.mes.balance < 0">
+        <span>Balance del mes</span>
+        <strong>${{ d.mes.balance.toFixed(2) }}</strong>
+      </div>
+    </div>
+
+    <div class="dashboard-columnas">
+      <!-- Barras CSS: la altura de cada una es un % del día con más ventas (maxDia). -->
+      <section class="panel">
+        <h3>Ventas de los últimos 7 días</h3>
+        @if (d.ultimosDias.length === 0) {
+          <p class="estado-mensaje">Sin ventas en estos días.</p>
+        } @else {
+          <div class="barras">
+            @for (dia of d.ultimosDias; track dia.fecha) {
+              <div class="barra-grupo">
+                <small>${{ dia.total.toFixed(0) }}</small>
+                <div class="barra" [style.height.%]="(dia.total / maxDia()) * 100"></div>
+                <span>{{ dia.fecha.slice(5) }}</span>
+              </div>
+            }
+          </div>
+        }
+      </section>
+
+      <!-- Ranking de productos por unidades vendidas. -->
+      <section class="panel">
+        <h3>Más vendidos (30 días)</h3>
+        <ol class="lista">
+          @for (p of d.masVendidos; track p.id) {
+            <li><span>{{ p.nombre }}</span><strong>{{ p.unidades }} u.</strong></li>
+          } @empty {
+            <li class="estado-mensaje">Todavía no hay ventas.</li>
+          }
+        </ol>
+      </section>
+
+      <!-- Productos que casi se agotan; en rojo los que ya están en 0. -->
+      <section class="panel">
+        <h3>Stock bajo (≤ {{ d.umbralStockBajo }})</h3>
+        <ul class="lista">
+          @for (p of d.stockBajo; track p.id) {
+            <li><span>{{ p.nombre }}</span><strong [class.agotado]="p.cantidad === 0">{{ p.cantidad }}</strong></li>
+          } @empty {
+            <li class="estado-mensaje">Todo el inventario está bien surtido.</li>
+          }
+        </ul>
+      </section>
+
+      <section class="panel">
+        <h3>Resumen</h3>
+        <ul class="lista">
+          <li><span>Productos</span><strong>{{ d.conteos.productos }}</strong></li>
+          <li><span>Empleados activos</span><strong>{{ d.conteos.empleadosActivos }}</strong></li>
+          <li><span>Usuarios</span><strong>{{ d.conteos.usuarios }}</strong></li>
+          <li><span>Compras pendientes</span><strong>{{ d.conteos.comprasPendientes }}</strong></li>
+        </ul>
+      </section>
+    </div>
+  </div>
+}

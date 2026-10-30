@@ -1,11 +1,22 @@
 <!-- routerLink navega a otra ruta sin recargar la página (es el href de Angular).
-     routerLinkActive="activo" agrega la clase CSS `activo` al enlace de la página en la que estás. -->
+     routerLinkActive="activo" agrega la clase CSS `activo` al enlace de la página en la que estás.
+     Los enlaces de gestión solo se dibujan para el administrador (@if). -->
 <nav class="navbar">
-  <a routerLink="/finanzas" routerLinkActive="activo" class="nav-link">Finanzas</a>
-  <a routerLink="/inventario" routerLinkActive="activo" class="nav-link">Inventario</a>
-  <a routerLink="/ventas" routerLinkActive="activo" class="nav-link">Ventas y facturación</a>
-  <a routerLink="/compras" routerLinkActive="activo" class="nav-link">Compras (Insumos)</a>
-  <a routerLink="/rh" routerLinkActive="activo" class="nav-link">RH</a>
-  <!-- Por ahora "Cerrar sesión" solo regresa al login (todavía no hay sesión real). -->
-  <a routerLink="/login" class="nav-link nav-link-salir">Cerrar sesión</a>
+  @if (auth.esAdmin()) {
+    <a routerLink="/dashboard" routerLinkActive="activo" class="nav-link">Panel</a>
+    <a routerLink="/finanzas" routerLinkActive="activo" class="nav-link">Finanzas</a>
+    <a routerLink="/inventario" routerLinkActive="activo" class="nav-link">Inventario</a>
+  }
+  @if (auth.esAdmin()) {
+    <a routerLink="/ventas" routerLinkActive="activo" class="nav-link">Ventas y facturación</a>
+  }
+  <a routerLink="/checkout" routerLinkActive="activo" class="nav-link">Checkout</a>
+  <a routerLink="/facturacion" routerLinkActive="activo" class="nav-link">Facturación</a>
+  @if (auth.esAdmin()) {
+    <a routerLink="/compras" routerLinkActive="activo" class="nav-link">Compras (Insumos)</a>
+    <a routerLink="/rh" routerLinkActive="activo" class="nav-link">RH</a>
+    <a routerLink="/usuarios" routerLinkActive="activo" class="nav-link">Usuarios</a>
+  }
+  <!-- Es un botón (no un enlace) porque ejecuta una acción: borrar la sesión y volver al login. -->
+  <button type="button" class="nav-link nav-link-salir" (click)="auth.cerrarSesion()">Cerrar sesión</button>
 </nav>

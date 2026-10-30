@@ -1,0 +1,6 @@
+<!-- Pantalla a la que rolGuard manda a quien no tiene permiso. El botón lo lleva a su página inicial según su rol. -->
+<section class="sin-acceso">
+  <h1>Sin acceso</h1>
+  <p>Tu usuario no tiene permiso para ver esta página.</p>
+  <a [routerLink]="auth.rutaInicial()" class="sin-acceso-boton">Volver al inicio</a>
+</section>

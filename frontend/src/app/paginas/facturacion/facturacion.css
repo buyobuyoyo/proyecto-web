@@ -1,0 +1,87 @@
+.facturacion-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+h2 {
+  margin: 0 0 0.8rem;
+  font-size: 1.1rem;
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tabla th,
+.tabla td {
+  padding: 0.8rem 1.1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--borde);
+}
+
+.tabla th {
+  font-size: 0.8rem;
+  color: var(--texto-suave);
+  background: var(--gris-claro);
+}
+
+.tabla small {
+  display: block;
+  color: var(--texto-suave);
+}
+
+.aviso {
+  margin: 0;
+  padding: 0.7rem 0.9rem;
+  border-radius: var(--radio-chico);
+  background: var(--verde-suave);
+  color: var(--verde-oscuro);
+  font-weight: 600;
+}
+
+/* Estado del correo: verde enviado, rojo fallido, gris el resto. */
+.etiqueta {
+  padding: 0.2rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  background: var(--gris-claro);
+}
+
+.etiqueta-enviado {
+  background: var(--verde-suave);
+  color: var(--verde-oscuro);
+}
+
+.etiqueta-fallido {
+  background: #fde8e8;
+  color: #b3261e;
+}
+
+.acciones {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.accion {
+  padding: 0.4rem 0.9rem;
+  border: 1px solid var(--gris-medio);
+  border-radius: 999px;
+  background: white;
+  font-weight: 600;
+}
+
+.accion:hover {
+  border-color: var(--verde-principal);
+  color: var(--verde-principal);
+}
+
+/* En celular las tablas se deslizan horizontalmente en vez de desbordar la página. */
+@media (max-width: 700px) {
+  .lista-tarjeta {
+    overflow-x: auto;
+  }
+}

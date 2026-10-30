@@ -1,0 +1,115 @@
+/* Dos columnas: productos a la izquierda y el pedido a la derecha; en celular se apilan. */
+.checkout-layout {
+  display: grid;
+  grid-template-columns: 1.4fr 1fr;
+  gap: 1.5rem;
+  align-items: start;
+}
+
+.checkout-productos,
+.checkout-carrito {
+  padding: 1rem 1.2rem;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  background: white;
+  box-shadow: var(--sombra);
+}
+
+h2 {
+  margin: 0 0 0.8rem;
+  font-size: 1.1rem;
+}
+
+ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.lista-productos li,
+.lista-carrito li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.6rem 0;
+  border-bottom: 1px solid var(--borde);
+}
+
+.lista-productos small {
+  display: block;
+  color: var(--texto-suave);
+}
+
+.btn-agregar:disabled {
+  background: var(--gris-medio);
+  box-shadow: none;
+  cursor: not-allowed;
+}
+
+/* Controles − 2 + de cada línea del carrito. */
+.cantidad {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cantidad button {
+  width: 1.7rem;
+  height: 1.7rem;
+  border: 1px solid var(--gris-medio);
+  border-radius: 50%;
+  background: white;
+  font-weight: 700;
+}
+
+.cantidad button:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.total {
+  margin: 1rem 0;
+  font-size: 1.1rem;
+  text-align: right;
+}
+
+.paypal-botones {
+  margin-top: 0.5rem;
+}
+
+.mensaje-exito {
+  margin: 0 0 0.8rem;
+  padding: 0.7rem 0.9rem;
+  border-radius: var(--radio-chico);
+  background: var(--verde-suave);
+  color: var(--verde-oscuro);
+  font-weight: 600;
+}
+
+.aviso-sandbox {
+  margin: 0.8rem 0 0;
+  font-size: 0.8rem;
+  color: var(--texto-suave);
+  text-align: center;
+}
+
+@media (max-width: 700px) {
+  .checkout-layout {
+    grid-template-columns: 1fr;
+  }
+}
+
+.btn-factura {
+  margin: 0 0 0.8rem;
+  padding: 0.55rem 1.1rem;
+  border: 1px solid var(--verde-principal);
+  border-radius: 999px;
+  background: white;
+  color: var(--verde-oscuro);
+  font-weight: 600;
+}
+
+.btn-factura:hover {
+  background: var(--verde-suave);
+}

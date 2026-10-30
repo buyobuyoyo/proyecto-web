@@ -1,0 +1,81 @@
+/* Página en columna: botón de agregar, mensaje de error y la tabla. */
+.usuarios-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.tabla-usuarios {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.tabla-usuarios th,
+.tabla-usuarios td {
+  padding: 0.8rem 1.1rem;
+  text-align: left;
+  border-bottom: 1px solid var(--borde);
+}
+
+.tabla-usuarios th {
+  font-size: 0.8rem;
+  color: var(--texto-suave);
+  background: var(--gris-claro);
+}
+
+/* Etiqueta del rol: verde para administrador, gris para cliente. */
+.rol {
+  padding: 0.2rem 0.7rem;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  background: var(--gris-claro);
+}
+
+.rol-administrador {
+  background: var(--verde-suave);
+  color: var(--verde-oscuro);
+}
+
+/* Marca "tú" junto a la cuenta de la sesión actual. */
+.etiqueta-tu {
+  margin-left: 0.4rem;
+  font-size: 0.75rem;
+  color: var(--texto-suave);
+}
+
+.acciones {
+  display: flex;
+  gap: 0.5rem;
+  justify-content: flex-end;
+}
+
+.accion {
+  padding: 0.4rem 0.9rem;
+  border: 1px solid var(--gris-medio);
+  border-radius: 999px;
+  background: white;
+  font-weight: 600;
+}
+
+.accion:hover:not(:disabled) {
+  border-color: var(--verde-principal);
+  color: var(--verde-principal);
+}
+
+.accion-peligro:hover:not(:disabled) {
+  border-color: var(--rojo-cancelar);
+  color: var(--rojo-cancelar);
+}
+
+.accion:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* En celular la tabla se desliza horizontalmente en vez de desbordar la página. */
+@media (max-width: 700px) {
+  .lista-tarjeta {
+    overflow-x: auto;
+  }
+}

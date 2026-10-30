@@ -307,3 +307,9 @@
     font-size: 0.75rem;
   }
 }
+
+.exportar-xml {
+  display: flex;
+  gap: 0.5rem;
+  align-items: center;
+}

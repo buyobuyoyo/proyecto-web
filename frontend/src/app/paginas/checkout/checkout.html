@@ -1,0 +1,80 @@
+<!-- Tres bloques: lista de productos (izquierda), carrito y botones de PayPal (derecha) y, al final, el modal de factura. -->
+@if (cargando()) {
+  <p class="estado-mensaje">Cargando productos…</p>
+} @else {
+  <div class="checkout-layout">
+    <section class="checkout-productos">
+      <h2>Productos</h2>
+      <ul class="lista-productos">
+        <!-- track producto.id: Angular identifica cada fila por su id para actualizar solo lo que cambió. -->
+        @for (producto of productos(); track producto.id) {
+          <li>
+            <div>
+              <strong>{{ producto.nombre }}</strong>
+              <small>${{ producto.precio.toFixed(2) }} · {{ producto.cantidad }} disponibles</small>
+            </div>
+            <!-- Se deshabilita si está agotado o si el carrito ya tiene todo el stock disponible. -->
+            <button type="button" class="btn-agregar" (click)="agregar(producto)"
+              [disabled]="producto.cantidad === 0 || (carrito()[producto.id] ?? 0) >= producto.cantidad">
+              {{ producto.cantidad === 0 ? 'Agotado' : '+ Agregar' }}
+            </button>
+          </li>
+        } @empty {
+          <li class="estado-mensaje">No hay productos disponibles.</li>
+        }
+      </ul>
+    </section>
+
+    <section class="checkout-carrito">
+      <h2>Tu pedido</h2>
+
+      <!-- Compra exitosa: mensaje y, si hay venta pagada, botón para pedir la factura. -->
+      @if (exito()) {
+        <p class="mensaje-exito" role="status">{{ exito() }}</p>
+        @if (ventaPagada()) {
+          <button type="button" class="btn-factura" (click)="facturando.set(ventaPagada())">Solicitar factura</button>
+        }
+      }
+      @if (error()) {
+        <p class="estado-mensaje estado-error" role="alert">{{ error() }}</p>
+      }
+
+      @if (lineas().length === 0) {
+        <p class="estado-mensaje">Agrega productos para continuar.</p>
+      } @else {
+        <ul class="lista-carrito">
+          @for (linea of lineas(); track linea.producto.id) {
+            <li>
+              <span>{{ linea.producto.nombre }}</span>
+              <span class="cantidad">
+                <button type="button" (click)="quitar(linea.producto)" aria-label="Quitar uno">−</button>
+                {{ linea.cantidad }}
+                <button type="button" (click)="agregar(linea.producto)" aria-label="Agregar uno"
+                  [disabled]="linea.cantidad >= linea.producto.cantidad">+</button>
+              </span>
+              <span>${{ linea.importe.toFixed(2) }}</span>
+            </li>
+          }
+        </ul>
+        <!-- Este total es solo informativo; el monto que se cobra lo calcula el servidor. -->
+        <p class="total">Total: <strong>${{ total().toFixed(2) }}</strong></p>
+      }
+
+      <!-- El contenedor siempre existe para que PayPal dibuje sus botones; se oculta si el carrito
+           está vacío o mientras se confirma un pago. -->
+      <div #contenedorPaypal class="paypal-botones" [hidden]="lineas().length === 0 || cobrando()"></div>
+
+      @if (cobrando()) {
+        <p class="estado-mensaje">Confirmando tu pago…</p>
+      }
+      @if (config() && !config()!.paypalHabilitado) {
+        <p class="estado-mensaje">El pago con PayPal aún no está configurado en el servidor.</p>
+      } @else if (config()?.entorno === 'sandbox') {
+        <p class="aviso-sandbox">Modo de pruebas (sandbox): no se hacen cobros reales.</p>
+      }
+    </section>
+  </div>
+}
+
+<!-- El modal se abre cuando `facturando` tiene el id de una venta; al crear la factura avisa con (creada). -->
+<app-factura-modal [idVenta]="facturando()" (cerrar)="facturando.set(null)" (creada)="alFacturar($event)" />

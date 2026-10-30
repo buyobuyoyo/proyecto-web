@@ -6,8 +6,9 @@ const { anidar } = require('../utils/datos');
 
 module.exports = crearCrud({
   tabla: 'producto', // tabla sobre la que opera
-  // Columnas que el cliente puede escribir. `cantidad` es el stock actual.
-  columnas: ['nombre', 'id_categoria', 'cantidad', 'precio', 'codigo_barras', 'tags'],
+  // Columnas que el cliente puede escribir. `cantidad` (el stock) NO está: solo cambia con
+  // compras, ventas y devoluciones, nunca desde el formulario del producto.
+  columnas: ['nombre', 'id_categoria', 'precio', 'codigo_barras', 'tags'],
   listar: async () => {
     // Antes Supabase lo resolvía con select('*, categoria(*)'): cada producto traía
     // su categoría como objeto. Aquí se hace con un LEFT JOIN y se reacomoda.

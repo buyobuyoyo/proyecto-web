@@ -1,0 +1,116 @@
+.dashboard-layout {
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+/* Tarjetas de números clave: tantas columnas de al menos 180 px como quepan. */
+.tarjetas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 0.8rem;
+}
+
+.tarjeta {
+  display: flex;
+  flex-direction: column;
+  gap: 0.3rem;
+  padding: 1rem 1.1rem;
+  border: 1px solid var(--borde);
+  border-left: 4px solid var(--verde-principal);
+  border-radius: var(--radio);
+  background: white;
+  box-shadow: var(--sombra);
+}
+
+.tarjeta span {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--texto-suave);
+}
+
+.tarjeta strong {
+  font-size: 1.5rem;
+}
+
+.tarjeta small {
+  color: var(--texto-suave);
+}
+
+/* Balance negativo: la franja y la cifra pasan a rojo. */
+.tarjeta-negativa {
+  border-left-color: var(--rojo-cancelar);
+}
+
+.tarjeta-negativa strong {
+  color: var(--rojo-cancelar);
+}
+
+/* Paneles en cuadrícula que se acomoda al ancho disponible. */
+.dashboard-columnas {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1rem;
+}
+
+.panel {
+  padding: 1rem 1.2rem;
+  border: 1px solid var(--borde);
+  border-radius: var(--radio);
+  background: white;
+  box-shadow: var(--sombra);
+}
+
+.panel h3 {
+  margin: 0 0 0.8rem;
+  font-size: 1rem;
+}
+
+/* Gráfico de barras: cada grupo es columna (monto, barra, fecha); la barra crece desde abajo. */
+.barras {
+  display: flex;
+  align-items: flex-end;
+  gap: 0.6rem;
+  height: 180px;
+}
+
+.barra-grupo {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  align-items: center;
+  gap: 0.25rem;
+  font-size: 0.75rem;
+  color: var(--texto-suave);
+}
+
+.barra {
+  width: 100%;
+  min-height: 3px;
+  border-radius: 6px 6px 0 0;
+  background: var(--verde-principal);
+}
+
+.lista {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.lista li {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid var(--borde);
+}
+
+.lista li:last-child {
+  border-bottom: none;
+}
+
+.agotado {
+  color: var(--rojo-cancelar);
+}

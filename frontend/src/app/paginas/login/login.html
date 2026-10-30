@@ -5,14 +5,26 @@
 
     <!-- aria-label da un nombre al campo para lectores de pantalla (no hay <label> visible).
          `autocomplete` ayuda al navegador a ofrecer guardar/rellenar las credenciales. -->
-    <input type="text" class="login-input" placeholder="Usuario" name="usuario" autocomplete="username" aria-label="Usuario">
-    <input type="password" class="login-input" placeholder="Contraseña" name="password" autocomplete="current-password" aria-label="Contraseña">
+    <!-- Un <form> permite entrar también con la tecla Enter. (input) copia lo escrito al signal. -->
+    <form class="login-form" (submit)="$event.preventDefault(); entrar()">
+      <input type="text" class="login-input" placeholder="Usuario" name="usuario" autocomplete="username" aria-label="Usuario"
+        [value]="usuario()" (input)="usuario.set($any($event.target).value)">
+      <input type="password" class="login-input" placeholder="Contraseña" name="password" autocomplete="current-password" aria-label="Contraseña"
+        [value]="password()" (input)="password.set($any($event.target).value)">
 
-    <!-- Por ahora es un enlace que lleva a /finanzas; no comprueba las credenciales. -->
-    <a routerLink="/finanzas" class="login-boton" role="button">ENTRAR</a>
+      <button type="submit" class="login-boton" [disabled]="enviando()">
+        {{ enviando() ? 'ENTRANDO…' : 'ENTRAR' }}
+      </button>
 
-    <!-- Mensaje fijo de ejemplo: todavía no se muestra según un error real. -->
-    <p class="login-error">Error: Credenciales incorrectas</p>
+      <!-- Solo aparece cuando el último intento falló. -->
+      @if (error()) {
+        <p class="login-error" role="alert">{{ error() }}</p>
+      }
+    </form>
+
+    <p class="login-legal">
+      <a routerLink="/terminos">Términos y condiciones</a> · <a routerLink="/privacidad">Aviso de privacidad</a>
+    </p>
   </div>
 
   <div class="login-decorativo">

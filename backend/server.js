@@ -3,10 +3,14 @@
 // Visión general: este archivo crea la aplicación Express, le conecta los "middlewares"
 // (funciones que se ejecutan en cada petición antes de llegar a las rutas), monta cada grupo
 // de rutas bajo /api/... y, al final, arranca el servidor.
+require('dotenv').config(); // carga backend/.env en process.env (debe ir antes de usar process.env)
 const express = require('express'); // framework web: maneja peticiones HTTP y rutas
 const cors = require('cors'); // middleware que añade las cabeceras CORS (ver más abajo)
 const { pool } = require('./config/db'); // pool de conexiones a MySQL
 const { traducirError } = require('./utils/errores'); // convierte errores en mensajes para el usuario
+const { ADMIN, CLIENTE, secretoJwt, verificarToken, permitir, permitirPorMetodo } = require('./middleware/auth');
+
+secretoJwt(); // falla al arrancar si falta JWT_SECRET, en vez de fallar en el primer login
 
 // `app` es la aplicación: a ella se le van registrando middlewares y rutas.
 const app = express();
@@ -20,13 +24,32 @@ app.use(express.json());
 
 // Cada línea "monta" un grupo de rutas bajo un prefijo. Por ejemplo, GET /api/productos
 // se resuelve en routes/productos.js, en su ruta '/'.
-app.use('/api/categorias', require('./routes/categorias'));
-app.use('/api/productos', require('./routes/productos'));
-app.use('/api/proveedores', require('./routes/proveedores'));
-app.use('/api/empleados', require('./routes/empleados'));
-app.use('/api/finanzas', require('./routes/finanzas'));
-app.use('/api/compras', require('./routes/compras'));
-app.use('/api/ventas', require('./routes/ventas'));
+// Inicio de sesión: pública (login) y /yo, que valida el token por sí misma.
+app.use('/api/auth', require('./routes/auth'));
+
+// A partir de aquí todo exige token. Se aplica en cadena: verificarToken -> permisos -> ruta.
+// Catálogo de productos: cualquier usuario con sesión lo consulta (el checkout lo necesita);
+// solo el administrador lo modifica.
+const consultaAbierta = permitirPorMetodo({ GET: [ADMIN, CLIENTE], '*': [ADMIN] });
+app.use('/api/categorias', verificarToken, consultaAbierta, require('./routes/categorias'));
+app.use('/api/productos', verificarToken, consultaAbierta, require('./routes/productos'));
+
+// Compra en línea con PayPal: el servidor calcula precios y valida el pago (routes/checkout.js).
+app.use('/api/checkout', verificarToken, permitir(ADMIN, CLIENTE), require('./routes/checkout'));
+
+// Facturas XML: el administrador las gestiona todas; el cliente solo las de sus compras.
+app.use('/api/facturas', verificarToken, permitir(ADMIN, CLIENTE), require('./routes/facturas'));
+
+// Punto de venta del cajero: este API acepta precios y totales que manda el navegador, así
+// que solo lo usa el administrador. El cliente compra únicamente por /api/checkout.
+// Gestión interna: solo administrador.
+app.use('/api/empleados', verificarToken, permitir(ADMIN), require('./routes/empleados'));
+app.use('/api/ventas', verificarToken, permitir(ADMIN), require('./routes/ventas'));
+app.use('/api/proveedores', verificarToken, permitir(ADMIN), require('./routes/proveedores'));
+app.use('/api/finanzas', verificarToken, permitir(ADMIN), require('./routes/finanzas'));
+app.use('/api/compras', verificarToken, permitir(ADMIN), require('./routes/compras'));
+app.use('/api/usuarios', verificarToken, permitir(ADMIN), require('./routes/usuarios'));
+app.use('/api/dashboard', verificarToken, permitir(ADMIN), require('./routes/dashboard'));
 
 // Si la petición no coincidió con ninguna ruta de arriba, llega aquí: 404.
 // (Express ejecuta los middlewares en el orden en que se registran, por eso va después.)

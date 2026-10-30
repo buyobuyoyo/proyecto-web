@@ -118,6 +118,15 @@ export class Finanzas {
     this.modalAbierto.set(true);
   }
 
+  // Rango opcional del reporte XML (vacío = todos los movimientos).
+  xmlDesde = '';
+  xmlHasta = '';
+
+  async exportarXml() {
+    const { error } = await this.finanzaService.exportarXml(this.xmlDesde, this.xmlHasta);
+    if (error) alert(error);
+  }
+
   cerrarModal() {
     this.modalAbierto.set(false);
   }

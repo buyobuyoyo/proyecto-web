@@ -1,0 +1,31 @@
+<!-- Ventana emergente reutilizable (componente Modal). Se abre mientras haya una venta que facturar. -->
+<app-modal [abierto]="idVenta() !== null" [titulo]="'Facturar venta #' + idVenta()" (cerrar)="cerrar.emit()">
+  <form class="form-modal" (ngSubmit)="guardar()">
+    <label>
+      Nombre o razón social
+      <input type="text" name="nombre" [(ngModel)]="formulario.nombre_receptor" required minlength="3" maxlength="150">
+    </label>
+
+    <label>
+      RFC
+      <input type="text" name="rfc" [(ngModel)]="formulario.rfc_receptor" required maxlength="13" placeholder="XAXX010101000">
+    </label>
+
+    <label>
+      Correo donde enviar el XML
+      <input type="email" name="correo" [(ngModel)]="formulario.correo_receptor" required maxlength="120">
+    </label>
+
+    <!-- El mensaje de error del backend (RFC inválido, venta ya facturada...) aparece aquí. -->
+    @if (error()) {
+      <p class="form-error">{{ error() }}</p>
+    }
+
+    <div class="form-acciones">
+      <button type="button" class="form-btn-cancelar" (click)="cerrar.emit()">Cancelar</button>
+      <button type="submit" class="form-btn-guardar" [disabled]="guardando()">
+        {{ guardando() ? 'Generando…' : 'Generar factura' }}
+      </button>
+    </div>
+  </form>
+</app-modal>

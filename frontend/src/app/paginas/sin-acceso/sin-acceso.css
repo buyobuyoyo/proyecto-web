@@ -1,0 +1,33 @@
+/* Mensaje centrado en el área de contenido del layout. */
+.sin-acceso {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1rem;
+  padding: 4rem 1.5rem;
+  text-align: center;
+}
+
+.sin-acceso h1 {
+  margin: 0;
+  color: var(--rojo-cancelar);
+}
+
+.sin-acceso p {
+  margin: 0;
+}
+
+/* Enlace con aspecto de botón, igual al ENTRAR del login. */
+.sin-acceso-boton {
+  background: var(--verde-principal);
+  color: white;
+  padding: 0.75rem 1.75rem;
+  border-radius: 999px;
+  font-weight: 700;
+  text-decoration: none;
+  transition: background 0.15s ease;
+}
+
+.sin-acceso-boton:hover {
+  background: var(--verde-oscuro);
+}

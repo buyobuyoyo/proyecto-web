@@ -1,0 +1,94 @@
+@if (cargando()) {
+  <p class="estado-mensaje">Cargando usuarios…</p>
+} @else {
+  <div class="usuarios-layout">
+    <button type="button" class="btn-agregar" (click)="abrirNuevo()">+ Agregar usuario</button>
+
+    @if (error()) {
+      <p class="estado-mensaje estado-error">{{ error() }}</p>
+    }
+
+    <div class="lista-tarjeta">
+      <table class="tabla-usuarios">
+        <thead>
+          <tr>
+            <th>Usuario</th>
+            <th>Rol</th>
+            <th>Empleado</th>
+            <th></th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (usuario of usuarios(); track usuario.id) {
+            <tr>
+              <td>
+                {{ usuario.username }}
+                <!-- Marca la fila de la cuenta con la que se inició sesión. -->
+                @if (usuario.id === auth.usuario()?.id) {
+                  <span class="etiqueta-tu">tú</span>
+                }
+              </td>
+              <td><span class="rol" [class.rol-administrador]="usuario.rol === 'administrador'">{{ usuario.rol }}</span></td>
+              <td>{{ usuario.empleado ?? '—' }}</td>
+              <td class="acciones">
+                <button type="button" class="accion" (click)="abrirEditar(usuario)">Editar</button>
+                <!-- No se puede eliminar la propia cuenta (el backend también lo impide). -->
+                <button type="button" class="accion accion-peligro" (click)="eliminar(usuario)"
+                  [disabled]="usuario.id === auth.usuario()?.id">Eliminar</button>
+              </td>
+            </tr>
+          } @empty {
+            <tr><td colspan="4" class="estado-mensaje">No hay usuarios.</td></tr>
+          }
+        </tbody>
+      </table>
+    </div>
+  </div>
+}
+
+<app-modal
+  [abierto]="modalAbierto()"
+  [titulo]="editando() ? 'Editar usuario' : 'Nuevo usuario'"
+  (cerrar)="cerrarModal()">
+  <form class="form-modal" (ngSubmit)="guardar()">
+    <label>
+      Usuario (correo)
+      <input type="text" name="username" [(ngModel)]="formulario.username" required minlength="3" maxlength="50" autocomplete="off">
+    </label>
+
+    <!-- Al crear la contraseña es obligatoria; al editar es opcional (vacía = se conserva la actual). -->
+    <label>
+      {{ editando() ? 'Nueva contraseña (vacía = no cambiar)' : 'Contraseña' }}
+      <input type="password" name="password" [(ngModel)]="formulario.password" [required]="!editando()" autocomplete="new-password">
+    </label>
+
+    <label>
+      Rol
+      <select name="rol" [(ngModel)]="formulario.rol" required>
+        <option value="administrador">administrador</option>
+        <option value="cliente">cliente</option>
+      </select>
+    </label>
+
+    <label>
+      Empleado (opcional)
+      <select name="id_empleado" [(ngModel)]="formulario.id_empleado">
+        <option [ngValue]="null">Ninguno</option>
+        @for (empleado of empleados(); track empleado.id) {
+          <option [ngValue]="empleado.id">{{ empleado.nombre }}</option>
+        }
+      </select>
+    </label>
+
+    @if (formError()) {
+      <p class="form-error">{{ formError() }}</p>
+    }
+
+    <div class="form-acciones">
+      <button type="button" class="form-btn-cancelar" (click)="cerrarModal()">Cancelar</button>
+      <button type="submit" class="form-btn-guardar" [disabled]="guardando()">
+        {{ guardando() ? 'Guardando…' : 'Guardar' }}
+      </button>
+    </div>
+  </form>
+</app-modal>

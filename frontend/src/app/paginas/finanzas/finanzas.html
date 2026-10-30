@@ -62,6 +62,11 @@
   <section class="movimientos-seccion">
     <div class="movimientos-header">
       <h3>Movimientos</h3>
+      <div class="exportar-xml">
+        <input type="date" [(ngModel)]="xmlDesde" aria-label="Desde">
+        <input type="date" [(ngModel)]="xmlHasta" aria-label="Hasta">
+        <button type="button" class="btn-agregar" (click)="exportarXml()">Exportar XML</button>
+      </div>
       <button type="button" class="btn-agregar" (click)="abrirNuevoRegistro()">+ Agregar movimiento</button>
     </div>
 
